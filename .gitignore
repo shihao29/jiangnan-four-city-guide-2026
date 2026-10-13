@@ -1,0 +1,15 @@
+# 本地调研稿和历史版本
+2026国庆四城*.html
+2026国庆四城*.md
+四城景点高赞视频索引.html
+四城行程一览（给家里）.html
+assets/
+
+# 本地验收截图
+interaction-preview.png
+sidebar-preview.png
+侧边栏桌面预览.png
+
+# 系统文件
+.DS_Store
+Thumbs.db

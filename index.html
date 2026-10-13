@@ -1,0 +1,1906 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2026 国庆四城 · 地图交互攻略</title>
+<style>
+:root{
+  --brand:#0d9488;--brand-2:#059669;--brand-soft:#f0fdfa;
+  --card:#ffffff;--card-alt:#f9fafb;--text:#1f2937;--muted:#6b7280;--line:#e5e7eb;
+  --ok-bg:#f0fdf4;--ok-fg:#16a34a;--ok-line:#bbf7d0;
+  --warn-bg:#fffbeb;--warn-fg:#b45309;--warn-line:#fde68a;
+  --danger-bg:#fef2f2;--danger-fg:#dc2626;--danger-line:#fecaca;
+  --info-bg:#eff6ff;--info-fg:#2563eb;--info-line:#bfdbfe;
+  --note-bg:#fef9c3;--note-fg:#a16207;
+  --pending-bg:#fff7ed;--pending-fg:#ea580c;--pending-line:#fed7aa;
+  --radius:14px;--shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7f6;color:var(--text);
+  font:16px/1.8 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:16px}
+.hero{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;
+  border-radius:var(--radius);padding:26px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.hero h1{margin:0 0 6px;font-size:25px;line-height:1.35}
+.hero p{margin:0 0 12px;font-size:14px;opacity:.94}
+.tag{display:inline-block;background:rgba(255,255,255,.22);border-radius:999px;
+  padding:4px 12px;font-size:13px;margin:0 8px 6px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+h2{font-size:20px;margin:28px 0 12px;padding-left:11px;border-left:4px solid var(--brand)}
+h3{font-size:17px;margin:20px 0 8px}
+p{margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0;
+  display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 10px;vertical-align:top;text-align:left}
+th{background:#eef6f4;font-weight:500;white-space:nowrap}
+tbody tr:nth-child(even){background:var(--card-alt)}
+ul{margin:10px 0;padding-left:22px}
+li{margin:6px 0}
+.note{background:var(--note-bg);border-left:4px solid var(--note-fg);
+  border-radius:6px;padding:10px 14px;margin:12px 0;font-size:14px;color:#7c5308}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:#8a5a06;
+  border-radius:10px;padding:12px 14px;margin:12px 0;font-size:14px}
+.danger{background:var(--danger-bg);border:1px solid var(--danger-line);color:#b91c1c;
+  border-radius:10px;padding:12px 14px;margin:12px 0;font-size:14px}
+.ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:#15803d;
+  border-radius:10px;padding:12px 14px;margin:12px 0;font-size:14px}
+.cost{color:var(--info-fg);font-weight:500}
+.pend{background:var(--pending-bg);border:1px solid var(--pending-line);color:var(--pending-fg);
+  border-radius:6px;padding:1px 6px;font-size:13px;white-space:nowrap}
+.verified{color:#0f766e;font-size:13px;white-space:nowrap}
+.map{margin:14px 0;border-radius:var(--radius);overflow:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin:6px 0 0}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;
+  vertical-align:middle}
+.hotel-card{border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0;
+  background:var(--card-alt)}
+.hotel-card h4{margin:0 0 6px;font-size:16px;color:#0f5132}
+.hotel-card .meta{font-size:13.5px;color:var(--muted);margin:3px 0}
+.timeline{border-left:2px solid var(--brand-soft);margin:12px 0 12px 6px;padding-left:0}
+.tl-row{display:flex;gap:12px;padding:7px 0 7px 14px;position:relative;font-size:14.5px}
+.tl-row:before{content:"";position:absolute;left:-7px;top:15px;width:9px;height:9px;
+  border-radius:50%;background:var(--brand);border:2px solid #fff}
+.tl-row.gap:before{background:#94a3b8}
+.src{display:inline-block;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;border-radius:6px;
+  font-size:12px;font-weight:600;padding:1px 7px;margin-right:6px;vertical-align:1px}
+.src-note{background:#ecfdf5;border-left:4px solid #10b981;border-radius:10px;padding:10px 14px;
+  margin:10px 0;font-size:13.5px;color:#065f46}
+.tl-row.opt{background:#fffbeb;border:1px dashed #f59e0b;border-radius:10px;margin:6px 0;padding:8px 12px 8px 26px}
+.tl-row.opt:before{background:#fff;border:2px solid #f59e0b;left:5px;top:14px}
+.tl-row.opt .tl-time{color:#b45309;font-weight:700}
+.opt-badge{display:inline-block;background:#f59e0b;color:#fff;font-size:11.5px;font-weight:700;border-radius:5px;padding:1px 6px;margin-right:6px;vertical-align:1px}
+.tl-time{flex:0 0 108px;color:#0f766e;font-weight:500;font-size:13.5px}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
+.summary div{background:var(--brand-soft);border-radius:10px;padding:12px;text-align:center}
+.summary b{display:block;font-size:18px;color:#0f766e}
+.summary span{font-size:12.5px;color:var(--muted)}
+footer{font-size:12.5px;color:var(--muted);text-align:center;padding:22px 0 34px}
+.brk{background:linear-gradient(90deg,var(--brand),var(--brand-2));height:14px;
+  border-radius:7px;margin:4px 0 12px}
+.toc a{display:inline-block;margin:0 14px 8px 0;color:#0f766e;text-decoration:none;font-size:14px}
+@media(max-width:640px){
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .tl-row{flex-direction:column;gap:2px}
+  .tl-time{flex:none}
+  body{font-size:15px}
+  .hero h1{font-size:21px}
+}
+@media print{
+  body{background:#fff;font-size:10.5pt}
+  .wrap{max-width:none;padding:0}
+  .card,.hero{box-shadow:none;break-inside:avoid}
+  h2{break-after:avoid}
+  table{display:table;font-size:9pt}
+}
+
+/* v12 · 四城交互入口与地图阅读模式 */
+:root{
+  --ink:#17342f;--paper:#f5f2ea;--route:#d79b54;--route-dark:#986230;
+  --focus:0 0 0 4px rgba(13,148,136,.18)
+}
+html{scroll-behavior:smooth;scroll-padding-top:22px}
+body{background:var(--paper)}
+button,a{font:inherit}
+button:focus-visible,a:focus-visible{outline:none;box-shadow:var(--focus)}
+.skip-link{position:fixed;left:16px;top:-60px;z-index:1000;background:#fff;color:var(--ink);padding:9px 14px;border-radius:8px;border:1px solid var(--line);text-decoration:none;transition:top .2s}
+.skip-link:focus{top:12px}
+.hero{position:relative;overflow:hidden;background:#0a625b;border-radius:22px;padding:34px 30px;box-shadow:0 18px 50px rgba(4,52,44,.18)}
+.hero:after{content:"四城";position:absolute;right:-18px;bottom:-52px;color:rgba(255,255,255,.07);font:900 118px/1 Georgia,"Songti SC",serif;letter-spacing:-12px;pointer-events:none}
+.hero h1,h2,.gateway-title,.city-dialog h2{font-family:Georgia,"Songti SC","STSong",serif}
+.hero h1{font-size:30px;letter-spacing:.02em;position:relative;z-index:1}
+.hero p,.hero .tag{position:relative;z-index:1}
+.hero-cta{display:inline-flex;align-items:center;gap:9px;margin-top:12px;padding:10px 15px;background:#fff;color:#075e56;border:0;border-radius:9px;font-weight:800;cursor:pointer;box-shadow:0 5px 18px rgba(0,0,0,.14)}
+.hero-cta:hover{transform:translateY(-1px)}
+.city-gateway{background:#fff;border:1px solid #dce6e2;border-radius:22px;padding:26px 24px;margin:18px 0;box-shadow:0 12px 34px rgba(32,60,52,.08)}
+.gateway-kicker{color:var(--route-dark);font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.gateway-title{margin:4px 0 5px;font-size:25px;color:var(--ink)}
+.gateway-desc{margin:0;color:var(--muted);font-size:14px}
+.city-route{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:26px}
+.city-route:before{content:"";position:absolute;left:10%;right:10%;top:25px;height:2px;background:#d8c6aa}
+.city-stop{position:relative;display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:2px;padding:45px 14px 14px;text-align:left;background:#fbfaf6;border:1px solid #e2ddd1;border-radius:12px;color:var(--ink);cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.city-stop:before{content:attr(data-index);position:absolute;top:12px;left:14px;width:27px;height:27px;display:grid;place-items:center;border-radius:50%;background:#fff;border:2px solid var(--route);color:var(--route-dark);font:800 11px/1 Arial,sans-serif;z-index:1}
+.city-stop:hover,.city-stop[aria-selected="true"]{transform:translateY(-3px);border-color:#8ac6bd;box-shadow:0 10px 24px rgba(13,148,136,.12)}
+.city-stop strong{font-size:18px}
+.city-stop span{font-size:12.5px;color:var(--muted);line-height:1.55}
+.route-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;padding-top:13px;border-top:1px dashed #d8d3c8;color:#6f6659;font-size:12.5px}
+.route-foot b{color:#075e56}
+.toc{position:relative;box-shadow:none;border-color:#d9e3df;background:rgba(255,255,255,.92)}
+.toc a{border-bottom:1px solid transparent}
+.toc a:hover{color:#04342c;border-color:#0d9488}
+.map{position:relative;border:1px solid #d8e2de;background:#fff;padding:0 12px 12px;box-shadow:0 15px 35px rgba(35,68,59,.09);overflow:hidden}
+.map svg{display:block;height:auto;border-radius:10px;background:#f8faf9}
+.map-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 2px 9px}
+.map-toolbar-label{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:13px;font-weight:800}
+.map-toolbar-label:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--route);box-shadow:0 0 0 4px #f5e8d7}
+.map-toolbar-actions{display:flex;gap:7px}
+.map-tool{border:1px solid #cbd9d5;background:#fff;color:#075e56;padding:6px 9px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer}
+.map-tool:hover{background:#eef8f6;border-color:#8ac6bd}
+.map.map-pulse{animation:mapPulse 1.25s ease}
+@keyframes mapPulse{0%,100%{box-shadow:0 15px 35px rgba(35,68,59,.09)}45%{box-shadow:0 0 0 6px rgba(13,148,136,.18),0 18px 38px rgba(35,68,59,.12)}}
+.city-dialog,.map-dialog{width:min(680px,calc(100vw - 28px));max-height:min(86vh,820px);border:0;border-radius:20px;padding:0;background:#fff;color:var(--text);box-shadow:0 30px 90px rgba(10,39,34,.35)}
+.city-dialog::backdrop,.map-dialog::backdrop{background:rgba(7,32,28,.67);backdrop-filter:blur(3px)}
+.dialog-shell{position:relative;padding:27px 26px 24px}
+.dialog-close{position:absolute;right:15px;top:14px;width:38px;height:38px;border:1px solid #d9e3df;background:#fff;border-radius:50%;color:#35534d;font-size:22px;line-height:1;cursor:pointer}
+.city-dialog .city-no{color:var(--route-dark);font:800 12px/1 Arial,sans-serif;letter-spacing:.16em}
+.city-dialog h2{margin:7px 48px 6px 0;padding:0;border:0;font-size:30px;color:var(--ink)}
+.city-date{margin:0 0 18px;color:#0f766e;font-weight:700}
+.city-brief{font-size:15px;color:#455c57}
+.city-facts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:19px 0}
+.city-fact{padding:12px 0;border-top:1px solid #e5e7eb}
+.city-fact span{display:block;color:var(--muted);font-size:12px}
+.city-fact b{display:block;margin-top:3px;color:var(--ink);font-size:14px;line-height:1.55}
+.city-alert{background:#fff8e9;border-left:4px solid var(--route);padding:10px 12px;color:#755123;font-size:13px}
+.dialog-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}
+.dialog-action{border:1px solid #b8cdc7;background:#fff;color:#075e56;padding:9px 13px;border-radius:8px;font-weight:800;cursor:pointer}
+.dialog-action.primary{background:#0d766e;color:#fff;border-color:#0d766e}
+.dialog-action:hover{filter:brightness(.97)}
+.map-dialog{width:min(1080px,calc(100vw - 26px));max-height:92vh}
+.map-dialog .dialog-shell{padding:22px}
+.map-dialog h2{margin:0 52px 14px 0;padding:0;border:0;font-size:20px;color:var(--ink)}
+.map-lightbox-canvas{overflow:auto;max-height:calc(92vh - 86px);background:#f8faf9;border:1px solid #dbe5e2;border-radius:12px}
+.map-lightbox-canvas svg{display:block;width:100%;min-width:720px;height:auto}
+.scroll-progress{position:fixed;left:0;top:0;width:0;height:3px;background:var(--route);z-index:999;transition:width .08s linear}
+.back-top{position:fixed;right:18px;bottom:18px;width:44px;height:44px;border:1px solid #bdd1cb;border-radius:50%;background:#fff;color:#075e56;box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:20px;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(8px);transition:.2s;z-index:50}
+.back-top.show{opacity:1;pointer-events:auto;transform:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.side-menu-toggle{position:fixed;left:14px;bottom:18px;z-index:120;width:auto;display:inline-flex;align-items:center;gap:7px;border:1px solid #9abbb4;border-radius:10px;background:#075e56;color:#fff;padding:10px 13px;box-shadow:0 8px 24px rgba(0,0,0,.16);font-size:13px;font-weight:800;cursor:pointer}
+.side-menu-toggle:before{content:"☰";font-size:16px}
+.sidebar-backdrop{position:fixed;inset:0;z-index:129;border:0;background:rgba(7,32,28,.56);opacity:0;pointer-events:none;transition:opacity .2s}
+.city-sidebar{position:fixed;left:0;top:0;bottom:0;z-index:130;width:min(330px,86vw);display:flex;flex-direction:column;background:#fdfcf8;border-right:1px solid #cfdcd8;box-shadow:18px 0 55px rgba(10,39,34,.2);transform:translateX(-104%);transition:transform .22s ease}
+body.sidebar-open{overflow:hidden}
+body.sidebar-open .city-sidebar{transform:none}
+body.sidebar-open .sidebar-backdrop{opacity:1;pointer-events:auto}
+.sidebar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:20px 18px 14px;border-bottom:1px solid #dbe4e1;background:#fff}
+.sidebar-eyebrow{color:var(--route-dark);font-size:11px;font-weight:900;letter-spacing:.14em}
+.sidebar-title{margin:2px 0 0;color:var(--ink);font:800 25px/1.25 Georgia,"Songti SC","STSong",serif}
+.sidebar-subtitle{margin:5px 0 0;color:var(--muted);font-size:12px}
+.sidebar-close{width:36px;height:36px;flex:0 0 auto;border:1px solid #d3dfdb;border-radius:50%;background:#fff;color:#35534d;font-size:21px;cursor:pointer}
+.sidebar-scroll{overflow-y:auto;padding:10px 12px 22px}
+.sidebar-home{display:block;margin:2px 3px 10px;padding:9px 10px;border-radius:8px;color:#075e56;background:#edf8f5;text-decoration:none;font-size:13px;font-weight:800}
+.side-city{border-top:1px solid #dde5e2}
+.side-city:last-of-type{border-bottom:1px solid #dde5e2}
+.side-city summary{display:flex;align-items:center;gap:9px;padding:12px 7px;color:var(--ink);font-size:17px;font-weight:900;cursor:pointer;list-style:none}
+.side-city summary::-webkit-details-marker{display:none}
+.side-city summary:before{content:attr(data-index);width:25px;height:25px;display:grid;place-items:center;border:1.5px solid var(--route);border-radius:50%;color:var(--route-dark);font:800 10px/1 Arial,sans-serif}
+.side-city summary:after{content:"⌄";margin-left:auto;color:#729088;transition:transform .18s}
+.side-city[open] summary:after{transform:rotate(180deg)}
+.side-links{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 4px 12px 41px}
+.side-links a{display:block;padding:7px 8px;border-radius:6px;color:#526760;text-decoration:none;font-size:12.5px;line-height:1.35}
+.side-links a:hover,.side-links a.is-active{background:#e7f5f1;color:#075e56;font-weight:800}
+.side-tools{margin-top:12px;padding:12px 7px 0;color:#6a7e78;font-size:12px}
+.side-tools strong{display:block;margin-bottom:6px;color:#314e47;font-size:13px}
+.side-tools a{display:inline-block;margin:0 8px 6px 0;color:#0f766e;text-decoration:none}
+.pend,.verified{white-space:normal;overflow-wrap:anywhere}
+.section-heading{display:flex;align-items:center;gap:12px}
+.section-toggle{display:none;margin-left:auto;flex:0 0 auto;border:1px solid #b8cdc7;background:#fff;color:#075e56;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:800;cursor:pointer}
+.section-toggle:after{content:"⌄";display:inline-block;margin-left:6px;transition:transform .18s}
+.section-heading:not(.is-collapsed) .section-toggle:after{transform:rotate(180deg)}
+.subsection-heading{display:flex;align-items:flex-start;gap:10px}
+.subsection-toggle{display:none;margin-left:auto;flex:0 0 auto;border:1px solid #d1ddd9;background:#fff;color:#276159;border-radius:7px;padding:4px 8px;font-size:11.5px;font-weight:800;cursor:pointer}
+.subsection-toggle:after{content:"＋";margin-left:5px}.subsection-heading:not(.is-collapsed) .subsection-toggle:after{content:"－"}
+.fold-toggle{display:none;width:100%;align-items:center;justify-content:space-between;gap:12px;border:0;background:transparent;color:inherit;padding:0;text-align:left;cursor:pointer}
+.fold-label{font-weight:800}.fold-state{flex:0 0 auto;color:#075e56;background:#fff;border:1px solid currentColor;border-radius:7px;padding:3px 8px;font-size:12px;font-weight:800}
+.fold-body{display:block}.mobile-collapsible.is-folded .fold-body{display:block}
+@media(max-width:700px){
+  .wrap{padding:10px}.hero{padding:26px 20px;border-radius:16px}.hero:after{font-size:86px}.hero h1{font-size:25px}
+  .hero .tag:nth-of-type(n+5){display:none}
+  .city-gateway{padding:21px 16px;border-radius:16px}.city-route{grid-template-columns:1fr 1fr;gap:11px}.city-route:before{display:none}
+  .city-stop{padding:13px 12px 13px 48px;min-height:78px;justify-content:center}.city-stop:before{top:19px;left:12px}
+  .route-foot{align-items:flex-start;flex-direction:column}.city-facts{grid-template-columns:1fr}.dialog-shell{padding:24px 18px 20px}
+  .map{padding:0 7px 7px}.map-toolbar{align-items:flex-start}.map-toolbar-actions{flex-direction:column}.map-tool{padding:5px 7px}
+  h2.section-heading{font-size:18px;margin:18px 0 9px;padding:10px 0 10px 11px;border-bottom:1px solid #d8e2de}
+  .section-toggle{display:inline-flex;align-items:center}
+  .section-heading.is-collapsed{color:#294b44}
+  h3.subsection-heading{font-size:16px;margin:12px 0 7px;padding:9px 0;border-bottom:1px dashed #d7e0dd}
+  .subsection-toggle{display:inline-flex;align-items:center}
+  .fold-toggle{display:flex}
+  .mobile-collapsible{padding:11px 12px}
+  .mobile-collapsible.is-folded .fold-body{display:none}
+  .mobile-collapsible:not(.is-folded) .fold-toggle{padding-bottom:9px;margin-bottom:9px;border-bottom:1px dashed currentColor}
+}
+@media(min-width:1240px){
+  .side-menu-toggle,.sidebar-backdrop,.sidebar-close{display:none}
+  .city-sidebar{left:max(12px,calc(50% - 628px));top:18px;bottom:18px;width:196px;border:1px solid #cedbd7;border-radius:16px;box-shadow:0 12px 34px rgba(32,60,52,.1);transform:none}
+  .sidebar-head{padding:16px 14px 12px;border-radius:16px 16px 0 0}.sidebar-title{font-size:22px}.sidebar-subtitle{font-size:11px}
+  .sidebar-scroll{padding:7px 9px 16px}.side-city summary{font-size:15px;padding:10px 4px}.side-links{grid-template-columns:1fr;padding-left:34px}.side-links a{padding:6px;font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+@media print{
+  .skip-link,.city-gateway,.hero-cta,.map-toolbar,.scroll-progress,.back-top,.city-dialog,.map-dialog,.side-menu-toggle,.sidebar-backdrop,.city-sidebar{display:none!important}
+  body{background:#fff}.map{padding:0;border:0;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">跳到攻略正文</a>
+<div class="scroll-progress" aria-hidden="true"></div>
+<button class="side-menu-toggle" type="button" aria-controls="city-sidebar" aria-expanded="false">城市目录</button>
+<button class="sidebar-backdrop" type="button" aria-label="关闭城市目录"></button>
+<aside class="city-sidebar" id="city-sidebar" aria-label="城市与内容目录">
+  <div class="sidebar-head">
+    <div><div class="sidebar-eyebrow">TRIP INDEX</div><h2 class="sidebar-title">城市</h2><p class="sidebar-subtitle">选城市，再选要看的内容</p></div>
+    <button class="sidebar-close" type="button" aria-label="关闭城市目录">×</button>
+  </div>
+  <nav class="sidebar-scroll" aria-label="四城攻略导航">
+    <a class="sidebar-home" href="#city-gateway" data-side-jump="city-gateway">← 返回四城入口</a>
+    <details class="side-city" data-index="01" open>
+      <summary>南京</summary>
+      <div class="side-links">
+        <a href="#map-nanjing" data-side-jump="map-nanjing">城市地图</a>
+        <a href="#day-0930" data-side-jump="day-0930">9/30 抵达</a>
+        <a href="#day-1001" data-side-jump="day-1001">10/1 行程</a>
+        <a href="#s10" data-side-jump="s10">深度攻略</a>
+        <a href="#food-nanjing" data-side-jump="food-nanjing">吃什么</a>
+        <a href="#pitfall-nanjing" data-side-jump="pitfall-nanjing">避坑</a>
+      </div>
+    </details>
+    <details class="side-city" data-index="02">
+      <summary>苏州</summary>
+      <div class="side-links">
+        <a href="#map-suzhou" data-side-jump="map-suzhou">城市地图</a>
+        <a href="#day-1002" data-side-jump="day-1002">10/2 行程</a>
+        <a href="#day-1003" data-side-jump="day-1003">10/3 行程</a>
+        <a href="#s11" data-side-jump="s11">深度攻略</a>
+        <a href="#food-suzhou" data-side-jump="food-suzhou">吃什么</a>
+        <a href="#pitfall-suzhou" data-side-jump="pitfall-suzhou">避坑</a>
+      </div>
+    </details>
+    <details class="side-city" data-index="03">
+      <summary>上海</summary>
+      <div class="side-links">
+        <a href="#map-shanghai" data-side-jump="map-shanghai">城市地图</a>
+        <a href="#day-1003" data-side-jump="day-1003">10/3 抵达</a>
+        <a href="#day-1004" data-side-jump="day-1004">10/4 行程</a>
+        <a href="#s12" data-side-jump="s12">深度攻略</a>
+        <a href="#food-shanghai" data-side-jump="food-shanghai">吃什么</a>
+        <a href="#pitfall-shanghai" data-side-jump="pitfall-shanghai">避坑</a>
+      </div>
+    </details>
+    <details class="side-city" data-index="04">
+      <summary>杭州</summary>
+      <div class="side-links">
+        <a href="#map-hangzhou" data-side-jump="map-hangzhou">城市地图</a>
+        <a href="#day-1005" data-side-jump="day-1005">10/5 抵达</a>
+        <a href="#day-1006" data-side-jump="day-1006">10/6 行程</a>
+        <a href="#day-1007" data-side-jump="day-1007">10/7 返程</a>
+        <a href="#s13" data-side-jump="s13">深度攻略</a>
+        <a href="#food-hangzhou" data-side-jump="food-hangzhou">吃什么</a>
+        <a href="#pitfall-hangzhou" data-side-jump="pitfall-hangzhou">避坑</a>
+      </div>
+    </details>
+    <div class="side-tools"><strong>公共内容</strong><a href="#s1" data-side-jump="s1">住宿</a><a href="#pool" data-side-jump="pool">预约池</a><a href="#s4" data-side-jump="s4">通勤</a><a href="#s5" data-side-jump="s5">预算</a><a href="#s7" data-side-jump="s7">应急</a></div>
+  </nav>
+</aside>
+<div class="wrap">
+
+<div class="hero">
+  <h1>2026 国庆四城 · 地图版攻略</h1>
+  <p>南京 → 苏州 → 上海 → 杭州｜4 人 2 间双床｜9/30 – 10/7｜<b>9/30 晚落地当天就开玩</b>，动线与通勤按真实门址坐标重算</p>
+  <span class="tag">v12.2 · 城市侧栏</span>
+  <span class="tag">小红书实抓 1217 篇</span>
+  <span class="tag">四城深度攻略</span>
+  <span class="tag">🅟 预备项目池（可选不占时间）</span>
+  <span class="tag">📕 路线照抄小红书高赞实测</span>
+  <span class="tag">9/30 夜游秦淮河</span>
+  <span class="tag">酒店已定</span>
+  <span class="tag">地图带指北针</span>
+  <span class="tag">通勤实测</span>
+  <br><button class="hero-cta" type="button" data-open-gateway>从城市入口开始 <span aria-hidden="true">↓</span></button>
+</div>
+
+<section class="city-gateway" id="city-gateway" aria-labelledby="gateway-title">
+  <div class="gateway-kicker">CITY SELECTOR · 9/30—10/7</div>
+  <h2 class="gateway-title" id="gateway-title">先选一座城，再展开它的攻略</h2>
+  <p class="gateway-desc">按实际行程顺序排列。点城市可快速查看停留时间、重点路线、酒店与预约提醒。</p>
+  <div class="city-route" aria-label="四城路线">
+    <button class="city-stop" type="button" data-city="nanjing" data-index="01" aria-haspopup="dialog" aria-selected="false"><strong>南京</strong><span>9/30 夜—10/2 早<br>秦淮夜景 · 梧桐线</span></button>
+    <button class="city-stop" type="button" data-city="suzhou" data-index="02" aria-haspopup="dialog" aria-selected="false"><strong>苏州</strong><span>10/2—10/3<br>园林 · 平江路</span></button>
+    <button class="city-stop" type="button" data-city="shanghai" data-index="03" aria-haspopup="dialog" aria-selected="false"><strong>上海</strong><span>10/3—10/5<br>武康路 · 外滩夜景</span></button>
+    <button class="city-stop" type="button" data-city="hangzhou" data-index="04" aria-haspopup="dialog" aria-selected="false"><strong>杭州</strong><span>10/5—10/7<br>漂流 · 西湖秘境</span></button>
+  </div>
+  <div class="route-foot"><span><b>行程顺序已锁定：</b>南京 → 苏州 → 上海 → 杭州</span><span>地图支持全屏放大 · 攻略支持城市直达</span></div>
+</section>
+
+<div class="card toc" id="main-content">
+  <strong>目录</strong><br>
+  <a href="#s0">① 上海住宿与通勤</a>
+  <a href="#s1">② 四城住宿实况</a>
+  <a href="#s2">③ 四城地图 + 玩什么</a>
+  <a href="#pool">🅟 预备项目池</a>
+  <a href="#s3">④ 每日动线</a>
+  <a href="#s4">⑤ 通勤实测表</a>
+  <a href="#s5">⑥ 预算</a>
+  <a href="#s6">⑦ 避坑</a>
+  <a href="#s7">⑧ 应急</a>
+  <a href="#s8">⑨ 小红书热度榜</a>
+  <a href="#s9">⑩ 小红书干货</a>
+  <a href="#s10">⑪ 南京深度攻略</a>
+  <a href="#s11">⑫ 苏州深度攻略</a>
+  <a href="#s12">⑬ 上海深度攻略</a>
+  <a href="#s13">⑭ 杭州深度攻略</a>
+</div>
+
+<div class="summary">
+  <div><b>7 晚</b><span>夜数</span></div>
+  <div><b>4 城</b><span>南京/苏州/上海/杭州</span></div>
+  <div><b>苏州利好</b><span>酒店旁 3 景点步行达</span></div>
+  <div><b>上海住</b><span>富饶智选·陆家浜路</span></div>
+</div>
+
+<h2 id="s0">① 上海住宿与通勤（富饶智选酒店）</h2>
+
+<div class="ok">
+  <strong>上海住哪 —— 富饶智选酒店（第九人民医院 · 陆家浜路地铁站店）。</strong><br>
+  地址：<b>黄浦区半淞园路街道南车站路 1 号富南大厦 4 楼</b>（门址级坐标 31.211829, 121.490126）。
+  上海段通勤按这个门址实测（腾讯地图，2026-09-28 晚），从酒店出发：
+  <table style="margin-top:8px">
+    <tr><th>从酒店出发</th><th>推荐方式</th><th>用时</th><th>花费</th><th>说明</th></tr>
+    <tr style="background:#f0fdfa"><td><b>陆家浜路地铁站</b>（8 / 9 号线）</td><td>步行</td><td><b>6 分钟</b></td><td>0 元</td><td>405 米 —— 出门就上地铁</td></tr>
+    <tr style="background:#f0fdfa"><td><b>外滩</b></td><td>打车</td><td><b>13 分</b>（晚高峰约 27 分）</td><td><b>16 元</b></td><td>3.7 公里；地铁要 37 分 / 3 元 且走 1.5 公里</td></tr>
+    <tr style="background:#f0fdfa"><td><b>南京路步行街</b></td><td>打车</td><td><b>15 分</b>（晚高峰约 25 分）</td><td><b>16 元</b></td><td>3.9 公里</td></tr>
+    <tr style="background:#f0fdfa"><td><b>豫园 · 城隍庙</b></td><td>打车 / 步行</td><td><b>9 分</b> / 步行 22 分</td><td><b>14 元</b> / 0 元</td><td>2.6 公里 —— 晚上就近逛的首选</td></tr>
+    <tr style="background:#f0fdfa"><td><b>陆家嘴 · 东方明珠</b></td><td>打车</td><td><b>15 分</b></td><td><b>22 元</b></td><td>6.3 公里；地铁 36 分 / 3 元</td></tr>
+    <tr style="background:#f0fdfa"><td><b>武康大楼</b></td><td>打车</td><td><b>17 分</b></td><td><b>21 元</b></td><td>10/4 上午那段，打车比地铁省事</td></tr>
+    <tr style="background:#f0fdfa"><td><b>上海站</b>（10/3 抵达）</td><td>打车</td><td><b>24 分</b></td><td><b>28 元</b></td><td>地铁 42 分 / 3 元 且要走 1.4 公里，拖行李不值</td></tr>
+    <tr style="background:#f0fdfa"><td><b>上海松江站</b>（10/5 赶 K575）</td><td><b>地铁 9 号线直达</b></td><td><b>1 小时 18 分</b></td><td>7 元</td><td><b>21 站直达、全程只走 485 米</b> ⭐ 10/5 上午 10:00 出门都宽松</td></tr>
+  </table>
+  <div class="note" style="margin-bottom:0">📝 打车用时我给了两个值：<b>平峰 13–15 分</b>（2026-09-28 22:30 实测）、<b>晚高峰 25–27 分</b>（9/26 周六 19:00 实测）。10/3、10/4 都是假期客流高峰，实际会介于两者之间偏晚高峰那端，所以动线里按<b>偏保守</b>估。<b>现场叫车若排队超过 10 分钟，立刻改地铁</b>（回酒店走 10 号线南京东路站）。</div>
+</div>
+
+<div class="warn">
+  <strong>⚠️ 富饶智选入住前要留意 3 件事</strong>
+  <ul>
+    <li><b>1. 它在富南大厦 4 楼，是写字楼里的酒店。</b>注意电梯高峰是否排队、房间隔音、夜间楼层安保。<b>办入住先看房再刷卡</b>，不满意当场换房。</li>
+    <li><b>2. 国庆外滩—南京东路一带会交通管制。</b>出租车常进不了核心区，会被要求在外围下车或排队。10/3、10/4 两次去外滩，<b>回程建议走到 10 号线南京东路站坐地铁回陆家浜路</b>，比打车稳。</li>
+    <li><b>3. 周边是老城厢，不是商圈。</b>好处是本地早点多、便宜；坏处是便利店密度和夜宵不如南京东路。<b>先在陆家浜路沿线买好水和早点。</b></li>
+  </ul>
+</div>
+
+<h2 id="s1">② 住宿实况（门址 · 房型 · 通勤）</h2>
+
+<div class="hotel-card">
+  <h4>📍 南京 · 古南都逸居酒店（南京新街口地铁站店）</h4>
+  <div class="meta">地址：秦淮区石鼓路 58 号（大洋百货旁）</div>
+  <div class="meta">位置：距新街口地铁站 3 号口约 358 米，驾车约 2 分钟</div>
+  <div class="meta">评分 4.8 超棒 · 3519 条点评 · 2018 年开业 · 舒适型</div>
+  <div class="meta">设施：公共停车场、洗衣房、棋牌室、机器人服务、餐厅</div>
+  <div class="meta">📅 9/30 入住 → 10/2 退房（2 晚）· 逸居大床房 20–22㎡ 1.8m 床 · ¥421/2 晚 ≈ 均 376 元</div>
+  <div class="ok" style="margin-top:10px">
+    ✅ <b>实测最好的一家：酒店 → 南京站（10/2 07:35 早车）地铁 1 号线直达，22 分钟，3 元，步行 581 米。</b>07:35 的车，06:10 出门都宽裕。<br>
+    机场过来也顺：禄口机场 T1 → 机场巴士 3 号线（夫子庙线）→ 金陵饭店，1 小时 9 分，30 元，下车走 600 米就是酒店。
+  </div>
+</div>
+
+<div class="hotel-card" style="border-color:#bbf7d0;background:#f0fdf4">
+  <h4>📍 上海 · <b>富饶智选酒店</b>（第九人民医院 · 陆家浜路地铁站店）<span class="cost"> ✅ 已订</span></h4>
+  <div class="meta">地址：黄浦区半淞园路街道<b>南车站路 1 号富南大厦 4 楼</b>（近陆家浜路 / 南浦大桥 / 世博浦西园区）</div>
+  <div class="meta">门址坐标 31.211829, 121.490126（腾讯地图解析，小区/大厦级精度）</div>
+  <div class="meta">📅 10/3 入住 → 10/5 退房（2 晚）· 2 间 · 双床</div>
+  <div class="meta">🚇 最近地铁：<b>陆家浜路站（8 号线 / 9 号线）步行 405 米 / 6 分钟</b></div>
+  <div class="meta">实测（腾讯地图 2026-09-28）：→ 外滩 <b>打车 13 分 / 16 元</b>（晚高峰约 27 分）　→ 南京路步行街 打车 15 分 / 16 元</div>
+  <div class="meta">→ 豫园城隍庙 打车 9 分 / 14 元（步行 2.6 km / 22 分）　→ 陆家嘴 打车 15 分 / 22 元　→ 武康大楼 打车 17 分 / 21 元</div>
+  <div class="meta">10/3 抵达：上海站 → 酒店 <b>打车 24 分 / 28 元</b>（地铁 42 分 / 3 元 + 走 1.4 km）</div>
+  <div class="meta">10/5 赶车：→ 上海松江站 <b>地铁 9 号线直达 21 站，1 小时 18 分 / 7 元 / 全程只走 485 米</b> ⭐</div>
+  <div class="ok" style="margin-top:10px">
+    ✅ <b>这家的核心优势是「地铁口 400 米 + 9 号线一条线通松江站」。</b>10/5 赶车 1 小时 18 分直达、几乎不用走路。<br>
+    ⚠️ <b>它不在外滩步行圈（直线 3.2 公里）</b>，去外滩 / 南京路 / 陆家嘴都得打车或地铁 —— 但 4 人分摊单趟只要 3.5–7 元/人，比地铁还省事。<br>
+    ⚠️ 它在<b>写字楼富南大厦的 4 楼</b>，办入住先看房：电梯、隔音、采光。周边是老城厢，便利店和夜宵不如南京东路密，先备好水和早点。
+  </div>
+</div>
+
+<div class="hotel-card">
+  <h4>📍 杭州 · 汉庭酒店（杭州文三路地铁站店）</h4>
+  <div class="meta">地址：西湖区文三路 453 号（近黄龙体育中心体育馆）</div>
+  <div class="meta">评分 4.7 很好 · 707 条点评 · 2019 年装修 · 经济型 · 华住官方旗舰店</div>
+  <div class="meta">设施：收费停车、免费洗漱用品、24 小时前台、中餐厅、公共洗衣房</div>
+  <div class="meta">📅 10/5 入住 → 10/7 退房（2 晚）· 2 间</div>
+  <div class="ok" style="margin-top:10px">
+    ✅ <b>位置很聪明：文三路地铁站（10 号线 / 19 号线）</b>，去西湖和去火车站都不绕。
+    实测：酒店 → 断桥 46 分 3 元；酒店 → 杭州站（城站）35 分 3 元；杭州南站 → 酒店 1 小时 11 分 6 元。
+  </div>
+</div>
+
+<div class="hotel-card">
+  <h4>📍 苏州 · 来住酒店（苏州观前十全街店）</h4>
+  <div class="meta">地址：姑苏区竹辉路 358 号 101 室（地图解析坐标 31.2934, 120.6325，门址级精度）</div>
+  <div class="meta">房型：枕月瑰丽景观双床房 · 无早 · 2 间 1 晚</div>
+  <div class="meta">📅 10/2 入住 → 10/3 退房（1 晚）</div>
+  <div class="warn" style="margin-top:10px">
+    ⚠️ <b>名字叫「观前」，人不在观前。</b>实测离观前街 2.1 公里。别照酒店名规划路线，否则会以为「出门就是观前街」。
+  </div>
+  <div class="ok" style="margin-top:10px">
+    ✅ <b>但这是我看到四家里「零交通」性价比最高的一家。</b>出门步行 7 分钟网师园、9 分钟沧浪亭、8 分钟十全街 ——
+    10/2 下午下火车之后，一次车都不用坐就能玩起来。10/3 去苏州站赶车也只要 26 分钟地铁。
+  </div>
+</div>
+
+<h2 id="s2">③ 四城地图 + 玩什么</h2>
+
+<p>下面 4 张图是<b>按真实经纬度等距投影画的矢量小地图</b>：方格代表实际公里数，<b>右上角有指北针（上北下南）</b>；每个白底数字框都放在<b>两个点的连线中间</b>，表示这两点之间的直线距离。
+关于「能不能嵌真地图」，见文末说明。</p>
+
+<h3>南京 · 10/1 钟山—老城—梧桐</h3>
+<div class="map"><svg viewBox="0 0 680 638" width="100%" role="img" xmlns="http://www.w3.org/2000/svg"><title>南京 · 数字＝该点 ↔ 酒店的直线距离</title><rect x="0" y="0" width="680" height="638" rx="14" fill="#f8faf9" stroke="#dbe5e2" stroke-width="0.5"/><line x1="181.8" y1="10" x2="181.8" y2="628" stroke="#e8eeec" stroke-width="0.5"/><line x1="312.5" y1="10" x2="312.5" y2="628" stroke="#e8eeec" stroke-width="0.5"/><line x1="443.2" y1="10" x2="443.2" y2="628" stroke="#e8eeec" stroke-width="0.5"/><line x1="573.9" y1="10" x2="573.9" y2="628" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="71.8" x2="670" y2="71.8" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="202.5" x2="670" y2="202.5" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="333.2" x2="670" y2="333.2" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="463.9" x2="670" y2="463.9" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="594.6" x2="670" y2="594.6" stroke="#e8eeec" stroke-width="0.5"/><line x1="159.2" y1="402.7" x2="258.3" y2="60.0" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="65.5" y2="231.9" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="109.1" y2="321.5" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="242.9" y2="247.1" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="284.5" y2="243.6" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="252.2" y2="237.6" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="614.5" y2="338.8" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="559.8" y2="359.1" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="500.3" y2="314.2" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="553.0" y2="352.0" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="427.4" y2="393.0" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="184.1" y2="600.0" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="159.2" y1="402.7" x2="164.4" y2="563.3" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><rect x="188.0" y="222.9" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="208.7" y="231.9" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">5.5km</text><line x1="112.4" y1="317.3" x2="127.3" y2="344.6" stroke="#bcd4cd" stroke-width="1" opacity="0.75"/><rect x="106.6" y="336.1" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="127.3" y="345.1" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">3.0km</text><rect x="113.4" y="353.6" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="134.1" y="362.6" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">1.5km</text><rect x="180.4" y="316.4" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="201.1" y="325.4" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">2.7km</text><line x1="221.9" y1="323.2" x2="201.8" y2="348.6" stroke="#bcd4cd" stroke-width="1" opacity="0.75"/><rect x="181.1" y="340.1" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="201.8" y="349.1" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">3.1km</text><line x1="205.7" y1="320.2" x2="213.2" y2="307.0" stroke="#bcd4cd" stroke-width="1" opacity="0.75"/><rect x="192.5" y="298.5" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="213.2" y="307.5" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">2.9km</text><rect x="366.1" y="362.2" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="386.8" y="371.2" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">7.0km</text><line x1="359.5" y1="380.9" x2="327.4" y2="384.4" stroke="#bcd4cd" stroke-width="1" opacity="0.75"/><rect x="306.7" y="375.9" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="327.4" y="384.9" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">6.2km</text><rect x="309.1" y="350.0" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="329.8" y="359.0" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">5.4km</text><line x1="356.1" y1="377.4" x2="265.5" y2="389.1" stroke="#bcd4cd" stroke-width="1" opacity="0.75"/><rect x="244.8" y="380.6" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="265.5" y="389.6" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">6.1km</text><line x1="293.3" y1="397.9" x2="293.8" y2="412.9" stroke="#bcd4cd" stroke-width="1" opacity="0.75"/><rect x="273.1" y="404.4" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="293.8" y="413.4" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">4.1km</text><rect x="151.0" y="492.9" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="171.7" y="501.9" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">3.0km</text><rect x="141.1" y="474.5" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="161.8" y="483.5" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">2.5km</text><rect x="150.7" y="394.2" width="17" height="17" rx="3.5" fill="#ffffff" stroke="#b45309" stroke-width="3"/><rect x="156.2" y="399.7" width="6" height="6" rx="1.5" fill="#b45309"/><circle cx="258.3" cy="60.0" r="6.5" fill="#2563eb" stroke="#ffffff" stroke-width="2"/><circle cx="65.5" cy="231.9" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="109.1" cy="321.5" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="242.9" cy="247.1" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="284.5" cy="243.6" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="252.2" cy="237.6" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="614.5" cy="338.8" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="559.8" cy="359.1" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="500.3" cy="314.2" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="553.0" cy="352.0" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="427.4" cy="393.0" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="184.1" cy="600.0" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="164.4" cy="563.3" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><line x1="159.2" y1="402.7" x2="172.2" y2="440.7" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="172.2" y="440.7" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">酒店·古南都逸居（新街口）</text><line x1="258.3" y1="60.0" x2="271.3" y2="79.0" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="271.3" y="79.0" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">南京站 10/2 07:35 发车</text><text x="78.5" y="231.9" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">颐和路公馆区·梧桐</text><line x1="109.1" y1="321.5" x2="122.1" y2="283.5" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="122.1" y="283.5" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">先锋书店·五台山店</text><line x1="242.9" y1="247.1" x2="255.9" y2="266.1" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="255.9" y="266.1" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">鸡鸣寺</text><text x="297.5" y="243.6" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">解放门·台城城墙</text><line x1="252.2" y1="237.6" x2="265.2" y2="218.6" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="265.2" y="218.6" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">玄武湖·解放门</text><text x="627.5" y="338.8" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">中山陵</text><text x="572.8" y="359.1" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">美龄宫</text><text x="513.3" y="314.2" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">明孝陵·石象路</text><line x1="553.0" y1="352.0" x2="566.0" y2="390.0" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="566.0" y="390.0" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">陵园路梧桐大道</text><text x="440.4" y="393.0" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">南京博物院</text><text x="197.1" y="600.0" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">老门东</text><text x="177.4" y="563.3" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">夫子庙·秦淮河</text><g transform="translate(640.0,34.0)"><circle cx="0" cy="0" r="14" fill="#ffffff" stroke="#bcd4cd" stroke-width="1"/><polygon points="0,-9.5 3.8,-0.5 0,-3 -3.8,-0.5" fill="#33544d"/><polygon points="0,9.5 3.8,0.5 0,3 -3.8,0.5" fill="#d3e0dc"/><text x="0" y="-18.5" font-size="9.5" font-weight="700" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280" text-anchor="middle">N</text></g><text x="620.0" y="37.5" font-size="10" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280" text-anchor="end">上北下南</text><text x="18" y="26" font-size="12.5" font-weight="600" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d">南京 · 数字＝该点 ↔ 酒店的直线距离</text><text x="18" y="44" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280">白底数字框＝两点间直线距离，框位置就在这两点的连线中间</text></svg></div>
+<div class="legend">
+  <span><i style="background:#b45309"></i>酒店</span>
+  <span><i style="background:#2563eb"></i>火车站</span>
+  <span><i style="background:#0d9488"></i>景点</span>
+  <span>⬤ 方格 = 实际 2 公里</span>
+</div>
+
+<div class="card">
+  <strong>玩什么（<b>已剔除所有需预约景点</b>）</strong>
+  <table>
+    <tr><th>地点</th><th>预约 / 票价</th><th>怎么安排</th></tr>
+    <tr><td><b>颐和路公馆区</b></td><td><b>免费，不用预约</b></td><td>10/1 上午 09:00–10:30。法国梧桐 + 民国公馆，<b>小红书南京热度榜第一（5483 赞）</b>。先上先锋书店二楼拍全景</td></tr>
+    <tr><td><b>西桥</b></td><td>免费</td><td>10/1 上午顺路，拍紫峰大厦机位，20 分钟</td></tr>
+    <tr><td><b>鸡鸣寺</b></td><td><b>买票就进</b>，约 10 元</td><td>10/1 下午 13:30–14:10</td></tr>
+    <tr><td><b>解放门城墙（北线）</b></td><td><b>买票就进</b>，30 元</td><td>10/1 下午 14:10–14:50。<b>一段墙同时看鸡鸣寺 + 玄武湖 + 紫金山</b></td></tr>
+    <tr><td><b>玄武湖</b></td><td>免费开放</td><td>10/1 下午 14:50–16:30，解放门下来就是</td></tr>
+    <tr><td><b>老门东</b></td><td>免费街区</td><td>10/1 晚 19:00–21:00 晚饭 + 逛街巷（比夫子庙好逛、平价）</td></tr>
+    <tr><td><b>夫子庙 · 秦淮河</b></td><td>免费街区<br>（游船/贡院另收费，不去）</td><td><b>已提前到 9/30 晚上 22:55–23:50</b>（落地当天）。10/1 不再重复去</td></tr>
+    <tr style="background:#fffbeb"><td>中山陵</td><td>🅟 <b>必须实名预约</b></td><td><b>预备，不占时间块。</b>默认走明孝陵 · 石象路 / 美龄宫（买票就进，同一片钟山景区）。<b>约到了就替换 10/1 上午</b></td></tr>
+    <tr style="background:#fffbeb"><td>南京博物院</td><td>🅟 <b>必须预约</b></td><td><b>预备，不占时间块。</b>默认走颐和路 + 先锋书店（同样免费、同样室内）。<b>约到了就替换 10/1 09:00–12:00</b></td></tr>
+    <tr style="background:#fffbeb"><td>大屠杀遇难同胞纪念馆</td><td>🅟 需预约，本次未约上</td><td><b>预备，不占时间块。</b>约到了插 10/1 下午（替换鸡鸣寺 + 城墙）。国庆现场通常不放散客</td></tr>
+  </table>
+  <div class="note">📝 栖霞山（秋天红枫）在城东北约 22 公里，国庆人多且未到最佳期，不塞进 10/1。<br>
+  👉 <b>完整版见 <a href="#s10">⑪ 南京深度攻略</a></b>：171 篇实抓的红黑榜、票价、城墙该上哪段、三条可抄路线、带地址的店，以及 10/1 两套方案（<b>A 钟山线 · B 老城线，两套都不含预约项</b>）。本节只保留骨架。</div>
+</div>
+
+<h3>苏州 · 酒店在城南，玩点分南北两片（10/2 下午 – 10/3 中午）</h3>
+<div class="map"><svg viewBox="0 0 680 638" width="100%" role="img" xmlns="http://www.w3.org/2000/svg"><title>苏州 · 数字＝该点 ↔ 酒店的直线距离</title><rect x="0" y="0" width="680" height="638" rx="14" fill="#f8faf9" stroke="#dbe5e2" stroke-width="0.5"/><line x1="277.4" y1="10" x2="277.4" y2="628" stroke="#e8eeec" stroke-width="0.5"/><line x1="396.7" y1="10" x2="396.7" y2="628" stroke="#e8eeec" stroke-width="0.5"/><line x1="516.1" y1="10" x2="516.1" y2="628" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="108.4" x2="670" y2="108.4" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="227.7" x2="670" y2="227.7" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="347.0" x2="670" y2="347.0" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="466.3" x2="670" y2="466.3" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="585.6" x2="670" y2="585.6" stroke="#e8eeec" stroke-width="0.5"/><line x1="504.4" y1="536.7" x2="258.6" y2="60.0" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="504.4" y1="536.7" x2="517.8" y2="475.2" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="504.4" y1="536.7" x2="425.0" y2="519.2" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="504.4" y1="536.7" x2="330.6" y2="600.0" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="504.4" y1="536.7" x2="462.2" y2="130.2" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="504.4" y1="536.7" x2="513.3" y2="235.6" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="504.4" y1="536.7" x2="162.2" y2="219.0" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><rect x="360.8" y="289.9" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="381.5" y="298.9" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">4.5km</text><rect x="493.3" y="497.5" width="35.5" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="511.1" y="506.5" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">530m</text><rect x="446.9" y="519.5" width="35.5" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="464.7" y="528.5" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">680m</text><rect x="396.8" y="559.9" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="417.5" y="568.9" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">1.6km</text><rect x="462.6" y="325.0" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="483.3" y="334.0" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">3.4km</text><rect x="488.1" y="377.7" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="508.8" y="386.7" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">2.5km</text><rect x="312.6" y="369.4" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="333.3" y="378.4" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">3.9km</text><circle cx="258.6" cy="60.0" r="6.5" fill="#2563eb" stroke="#ffffff" stroke-width="2"/><rect x="495.9" y="528.2" width="17" height="17" rx="3.5" fill="#ffffff" stroke="#b45309" stroke-width="3"/><rect x="501.4" y="533.7" width="6" height="6" rx="1.5" fill="#b45309"/><circle cx="517.8" cy="475.2" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="425.0" cy="519.2" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="330.6" cy="600.0" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="462.2" cy="130.2" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="513.3" cy="235.6" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="162.2" cy="219.0" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><line x1="258.6" y1="60.0" x2="271.6" y2="79.0" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="271.6" y="79.0" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">苏州站</text><line x1="504.4" y1="536.7" x2="491.4" y2="498.7" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="491.4" y="498.7" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="end" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">酒店·来住（竹辉路358号）</text><text x="530.8" y="475.2" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">网师园·十全街</text><line x1="425.0" y1="519.2" x2="438.0" y2="481.2" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="438.0" y="481.2" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">沧浪亭</text><text x="343.6" y="600.0" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">盘门三景</text><text x="475.2" y="130.2" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">拙政园·苏博</text><text x="526.3" y="235.6" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">平江路</text><text x="175.2" y="219.0" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">山塘街</text><g transform="translate(640.0,34.0)"><circle cx="0" cy="0" r="14" fill="#ffffff" stroke="#bcd4cd" stroke-width="1"/><polygon points="0,-9.5 3.8,-0.5 0,-3 -3.8,-0.5" fill="#33544d"/><polygon points="0,9.5 3.8,0.5 0,3 -3.8,0.5" fill="#d3e0dc"/><text x="0" y="-18.5" font-size="9.5" font-weight="700" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280" text-anchor="middle">N</text></g><text x="620.0" y="37.5" font-size="10" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280" text-anchor="end">上北下南</text><text x="18" y="26" font-size="12.5" font-weight="600" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d">苏州 · 数字＝该点 ↔ 酒店的直线距离</text><text x="18" y="44" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280">白底数字框＝两点间直线距离，框位置就在这两点的连线中间</text></svg></div>
+<div class="legend">
+  <span><i style="background:#b45309"></i>酒店（竹辉路 358 号）</span>
+  <span><i style="background:#0d9488"></i>景点</span>
+  <span><i style="background:#2563eb"></i>苏州站</span>
+  <span>⬤ 方格 = 实际 1 公里</span>
+</div>
+
+<div class="card">
+  <strong>玩什么（按「离酒店远近」分两片，别来回横穿古城）</strong>
+  <table>
+    <tr><th>地点</th><th>预约 / 票价</th><th>怎么安排</th></tr>
+    <tr><td><b>网师园 · 十全街</b><br><span class="cost">步行 527 m / 7 分钟</span></td><td>网师园需购票（约 30–40 元）</td><td><b>10/2 下午主菜。</b>苏州最小最精的园林，半小时看完，性价比极高。出来直接就是十全街，一路吃喝逛</td></tr>
+    <tr><td><b>沧浪亭</b><br><span class="cost">步行 682 m / 9 分钟</span></td><td>需购票（约 15–20 元）</td><td>苏州现存最古老的园林，和网师园一左一右。两个加起来 2 小时，全程步行</td></tr>
+    <tr><td><b>盘门三景</b><br><span class="cost">约 1.5 公里 / 20 分钟</span></td><td>需购票</td><td>备选。水陆城门 + 瑞光塔。10/2 下午还有劲就去，累了直接跳过</td></tr>
+    <tr><td><b>拙政园</b><br><span class="cost">城北，打车 24 分钟</span></td><td><b>必须提前 1–7 天实名分时购票</b><br>「苏州园林旅游」官方渠道</td><td>2026 年 6/19–10/7 提前到 <b>06:45 开园</b>，10/3 早场 06:45–08:40。<b>那个点公交首班不稳，直接打车：24 分钟 / 18 元（4 人分摊 ≈ 4.5 元）</b>。学生票按 40 元准备</td></tr>
+    <tr style="background:#fffbeb"><td>苏州博物馆本馆<br><span class="cost">拙政园隔壁</span></td><td>🅟 <b>免费但必须分时预约</b><br>「苏州博物馆全预约」小程序 · 提前 7 天早 8 点放票</td><td><b>预备，不占时间块。</b>同样免费、同样室内，但国庆难抢。那 1.5 小时<b>默认给平江路慢走</b>；<b>约到了就从 10/3 09:20–10:50 切出来</b></td></tr>
+    <tr><td>平江路<br><span class="cost">离拙政园约 1 公里</span></td><td>免费街区</td><td><b>10/3 拙政园之后的主角</b>（苏博移出后，这里从「15 分钟打卡」升级成<b>慢慢逛 1.5 小时</b>）。要看夜景的话，改到 10/2 晚，从酒店坐车 38 分钟</td></tr>
+    <tr style="background:#fef2f2"><td>山塘街<br><span class="cost">地铁 36 分钟 / 3 元</span></td><td>免费街区</td><td>🚫 <b>国庆不排。</b>3534 赞国庆专篇第一条就是它。夜景确实好（5554 赞），但那是非假期。<b>往返 1 小时 10 分换人贴人不值</b> —— 见 <a href="#s11">⑫ 节</a></td></tr>
+    <tr><td>观前街<br><span class="cost">离酒店 2.1 公里</span></td><td>免费</td><td>⚠️ 不是「酒店楼下」。想吃朱鸿兴观前旗舰店（碧凤坊 90 号，焖肉面 / 爆鱼面 20–35 元/人），得和 10/3 城北那片拼在一起去</td></tr>
+  </table>
+  <div class="note">📝 两片的分法：<b>城南片（全程步行）</b>＝网师园 + 沧浪亭 + 十全街 + 盘门，给 10/2 下午；<b>城北片（坐车）</b>＝拙政园 + 平江路 + 观前街，给 10/3 上午（<b>苏博已移出</b>）。<b>中间不要来回横穿古城</b>，一趟 36 分钟很吃时间。<br>
+  👉 <b>完整版见 <a href="#s11">⑫ 苏州深度攻略</a></b>：381 篇实抓的热度榜、九大园林票价与性格、平江路怎么逛、6840 赞夜游线、国庆「规则怪谈」10 条、山塘街为什么移出。</div>
+</div>
+
+<h3>上海 · 数字＝这地方离酒店（富饶智选）有多远</h3>
+<div class="map"><svg viewBox="0 0 680 570" width="100%" role="img" xmlns="http://www.w3.org/2000/svg"><title>上海 · 数字＝该点 ↔ 已订酒店（富饶智选）的直线距离</title><rect x="0" y="0" width="680" height="570" rx="14" fill="#f8faf9" stroke="#dbe5e2" stroke-width="0.5"/><line x1="130.2" y1="10" x2="130.2" y2="560" stroke="#e8eeec" stroke-width="0.5"/><line x1="224.5" y1="10" x2="224.5" y2="560" stroke="#e8eeec" stroke-width="0.5"/><line x1="318.9" y1="10" x2="318.9" y2="560" stroke="#e8eeec" stroke-width="0.5"/><line x1="413.2" y1="10" x2="413.2" y2="560" stroke="#e8eeec" stroke-width="0.5"/><line x1="507.6" y1="10" x2="507.6" y2="560" stroke="#e8eeec" stroke-width="0.5"/><line x1="601.9" y1="10" x2="601.9" y2="560" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="100.3" x2="670" y2="100.3" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="194.7" x2="670" y2="194.7" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="289.0" x2="670" y2="289.0" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="383.4" x2="670" y2="383.4" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="477.7" x2="670" y2="477.7" stroke="#e8eeec" stroke-width="0.5"/><line x1="529.4" y1="453.9" x2="493.3" y2="454.4" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="529.4" y1="453.9" x2="432.3" y2="205.1" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="529.4" y1="453.9" x2="537.1" y2="153.5" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="529.4" y1="453.9" x2="616.0" y2="164.5" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="529.4" y1="453.9" x2="64.0" y2="531.6" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="529.4" y1="453.9" x2="220.3" y2="60.0" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="511.4" y1="454.1" x2="511.1" y2="427.1" stroke="#bcd4cd" stroke-width="1" opacity="0.75"/><rect x="493.3" y="418.6" width="35.5" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="511.1" y="427.6" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">380m</text><rect x="460.2" y="321.0" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="480.9" y="330.0" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">2.8km</text><rect x="512.6" y="295.2" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="533.3" y="304.2" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">3.2km</text><line x1="572.7" y1="309.2" x2="565.8" y2="332.4" stroke="#bcd4cd" stroke-width="1" opacity="0.75"/><rect x="545.1" y="323.9" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="565.8" y="332.9" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">3.2km</text><rect x="276.0" y="484.3" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="296.7" y="493.3" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">5.0km</text><rect x="354.2" y="248.5" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="374.9" y="257.5" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">5.3km</text><rect x="520.9" y="445.4" width="17" height="17" rx="3.5" fill="#ffffff" stroke="#b45309" stroke-width="3"/><rect x="526.4" y="450.9" width="6" height="6" rx="1.5" fill="#b45309"/><polygon points="493.3,447.4 500.3,454.4 493.3,461.4 486.3,454.4" fill="#0d9488" stroke="#ffffff" stroke-width="1.8"/><circle cx="432.3" cy="205.1" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="537.1" cy="153.5" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="616.0" cy="164.5" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="64.0" cy="531.6" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="220.3" cy="60.0" r="6.5" fill="#2563eb" stroke="#ffffff" stroke-width="2"/><line x1="529.4" y1="453.9" x2="516.4" y2="491.9" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="516.4" y="491.9" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="end" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">已订·富饶智选（南车站路1号）</text><line x1="493.3" y1="454.4" x2="506.3" y2="397.4" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="506.3" y="397.4" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">陆家浜路站 8/9号线</text><text x="445.3" y="205.1" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">南京路步行街</text><text x="550.1" y="153.5" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">外滩</text><line x1="616.0" y1="164.5" x2="603.0" y2="183.5" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="603.0" y="183.5" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="end" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">陆家嘴·东方明珠</text><text x="77.0" y="531.6" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">武康大楼</text><line x1="220.3" y1="60.0" x2="233.3" y2="79.0" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="233.3" y="79.0" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">上海站 10/3 抵达</text><g transform="translate(640.0,34.0)"><circle cx="0" cy="0" r="14" fill="#ffffff" stroke="#bcd4cd" stroke-width="1"/><polygon points="0,-9.5 3.8,-0.5 0,-3 -3.8,-0.5" fill="#33544d"/><polygon points="0,9.5 3.8,0.5 0,3 -3.8,0.5" fill="#d3e0dc"/><text x="0" y="-18.5" font-size="9.5" font-weight="700" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280" text-anchor="middle">N</text></g><text x="620.0" y="37.5" font-size="10" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280" text-anchor="end">上北下南</text><text x="18" y="26" font-size="12.5" font-weight="600" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d">上海 · 数字＝该点 ↔ 已订酒店（富饶智选）的直线距离</text><text x="18" y="44" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280">白底数字框＝两点间直线距离，框位置就在这两点的连线中间</text></svg></div>
+<div class="legend">
+  <span><i style="background:#b45309"></i>✅ 已订酒店（南车站路 1 号）</span>
+  <span><i style="background:#0d9488"></i>◆ 地铁站（陆家浜路 8/9 号线）</span>
+  <span><i style="background:#2563eb"></i>火车站</span>
+  <span><i style="background:#0d9488"></i>景点</span>
+  <span>⬤ 方格 = 实际 1 公里</span>
+  <span>🧭 上北下南</span>
+</div>
+<div class="note">📝 白底数字框放在<b>两个点的连线中间</b>，所以能直接看出「哪到哪」。这张图一句话就能读懂：<b>你的酒店在图的右下方，陆家浜路地铁站离它只有 380 米（等于出门就到）；外滩 3.2 公里、陆家嘴 3.2 公里、南京路 2.8 公里 —— 三个都超出步行范围，靠打车（13–15 分钟 / 16 元）解决。</b><br>
+另外两处没画进图里的远点：<b>上海松江站（10/5 发车）在西南 37 公里外，走 9 号线直达 1 小时 18 分</b>；它太远，放进图里会把整张图缩掉八成，黄浦这一片就糊成一团了。</div>
+
+<div class="card">
+  <strong>上海住宿：富饶智选（南车站路 1 号富南大厦 4 楼）</strong>
+  <table>
+    <tr><th>项目</th><th>数据</th></tr>
+    <tr><td>入住</td><td>10/3 入住 → 10/5 退房（2 晚）· 2 间 · 双床</td></tr>
+    <tr><td>最近地铁口</td><td><b>陆家浜路站 405 米 / 步行 6 分</b>（8 号线 / 9 号线）</td></tr>
+    <tr><td>→ 外滩 / 南京路</td><td>打车 13–15 分 / 16 元（晚高峰约 25–27 分）</td></tr>
+    <tr><td>→ 豫园城隍庙</td><td>打车 9 分 / 14 元，或步行 2.6 km / 22 分</td></tr>
+    <tr><td>→ 上海松江站（10/5 赶 K575）</td><td><b>9 号线直达 21 站，1 小时 18 分 / 7 元 / 只走 485 米</b></td></tr>
+    <tr><td>10/4 一天市内打车</td><td>约 6 趟 × 16–25 元 ÷ 4 人 ≈ <b>30 元/人</b></td></tr>
+  </table>
+  <div class="ok" style="margin-top:10px">
+    <b>怎么用这家酒店：</b>去市区景点一律打车（4 人分摊 3.5–7 元/人，和地铁同价但不用走 1.5 公里）；<b>回程一律坐地铁</b>（国庆外滩一带打不到车）。10/5 赶车走 9 号线，不用换乘。
+  </div>
+</div>
+
+<div class="card">
+  <strong>玩什么（酒店在黄浦南部，市区点靠打车串）</strong>
+  <table>
+    <tr><th>地点</th><th>怎么去（从酒店）</th><th>怎么安排</th></tr>
+    <tr><td><b>外滩</b></td><td><b>打车 13 分 / 16 元</b>（晚高峰约 27 分）<br>地铁 8→10 号线 37 分 / 3 元</td><td>10/4 晚 19:00–21:00 必去。海关大楼滨江看陆家嘴 → 和平饭店路口 → 外白渡桥方向，走走停停约 2 小时。<b>回程建议走 10 号线南京东路站，别硬等出租</b></td></tr>
+    <tr><td><b>南京路步行街</b></td><td><b>打车 15 分 / 16 元</b></td><td>和外滩同一个晚上串起来：南京路走到东头就是外滩。晚餐可在大壶春四川中路店（四川中路 136 号），生煎配汤 25–40 元/人，偏发面少汤，不是爆汁型</td></tr>
+    <tr><td><b>豫园 · 城隍庙</b></td><td><b>打车 9 分 / 14 元</b><br>或步行 2.6 km / 22 分</td><td>10/3 晚 18:30–20:30。<b>离酒店最近的景点</b>，落地当天一身行李时最省力。亮灯后比白天好看，别在里面买贵价小吃</td></tr>
+    <tr><td>陆家嘴 · 东方明珠</td><td>打车 15 分 / 22 元<br>地铁 9→2 号线 36 分 / 3 元</td><td>10/4 下午 14:00–17:00，地面步行 + 滨江，看高楼外观，<b>不上付费观景层</b></td></tr>
+    <tr><td>武康大楼 · 武康路 · 安福路</td><td><b>打车 17 分 / 21 元</b><br>（直线 5.0 公里）</td><td>10/4 上午 09:00–12:00，集中拍照，不堵居民门口。之后可直接打车去陆家嘴（约 20 分 / 32 元）</td></tr>
+    <tr><td>上海影视乐园（松江车墩）</td><td>—</td><td><b>放弃。</b>从市区过去 2 小时以上，路上要耗掉一整天</td></tr>
+  </table>
+  <div class="note">📝 迪士尼你没打算去，本版也不排（从市区过去 1.5 小时以上，一天就没了）。<br>
+  💡 <b>如果 10/4 想少打车</b>，可以改成「地铁 9 号线 → 打浦桥/嘉善路一带逛吃 + 晚上回外滩」，地铁单程 3 元。但国庆地铁挤，打车更稳。<br>
+  👉 <b>完整版见 <a href="#s12">⑬ 上海深度攻略</a></b>：329 篇实抓的热度榜、「北外滩 vs 外滩」4993 赞实测对比、9136 赞免费 citywalk 线、2 元轮渡、5357 赞本地土著的吃饭实话。</div>
+</div>
+
+<h3>杭州 · 西湖圈 + 站点关系</h3>
+<div class="map"><svg viewBox="0 0 680 442" width="100%" role="img" xmlns="http://www.w3.org/2000/svg"><title>杭州 · 数字＝该点 ↔ 酒店的直线距离</title><rect x="0" y="0" width="680" height="442" rx="14" fill="#f8faf9" stroke="#dbe5e2" stroke-width="0.5"/><line x1="119.7" y1="10" x2="119.7" y2="432" stroke="#e8eeec" stroke-width="0.5"/><line x1="268.5" y1="10" x2="268.5" y2="432" stroke="#e8eeec" stroke-width="0.5"/><line x1="417.3" y1="10" x2="417.3" y2="432" stroke="#e8eeec" stroke-width="0.5"/><line x1="566.1" y1="10" x2="566.1" y2="432" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="186.1" x2="670" y2="186.1" stroke="#e8eeec" stroke-width="0.5"/><line x1="10" y1="334.9" x2="670" y2="334.9" stroke="#e8eeec" stroke-width="0.5"/><line x1="158.0" y1="60.0" x2="208.7" y2="120.5" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="158.0" y1="60.0" x2="267.9" y2="182.3" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="158.0" y1="60.0" x2="64.0" y2="179.8" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="158.0" y1="60.0" x2="296.1" y2="170.2" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><line x1="158.0" y1="60.0" x2="616.0" y2="403.6" stroke="#0d9488" stroke-width="1.1" stroke-dasharray="5 4" opacity="0.45"/><rect x="162.7" y="81.7" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="183.4" y="90.7" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">2.6km</text><line x1="213.0" y1="121.2" x2="230.5" y2="140.7" stroke="#bcd4cd" stroke-width="1" opacity="0.75"/><rect x="209.8" y="132.2" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="230.5" y="141.2" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">5.5km</text><rect x="90.3" y="111.4" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="111.0" y="120.4" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">5.1km</text><line x1="227.1" y1="115.1" x2="225.4" y2="94.6" stroke="#bcd4cd" stroke-width="1" opacity="0.75"/><rect x="204.7" y="86.1" width="41.4" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="225.4" y="95.1" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">5.9km</text><rect x="363.4" y="223.3" width="47.3" height="17.0" rx="5" fill="#ffffff" stroke="#bcd4cd" stroke-width="0.8"/><text x="387.0" y="232.3" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d" text-anchor="middle" dominant-baseline="central">19.2km</text><rect x="149.5" y="51.5" width="17" height="17" rx="3.5" fill="#ffffff" stroke="#b45309" stroke-width="3"/><rect x="155.0" y="57.0" width="6" height="6" rx="1.5" fill="#b45309"/><circle cx="208.7" cy="120.5" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="267.9" cy="182.3" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="64.0" cy="179.8" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="2"/><circle cx="296.1" cy="170.2" r="6.5" fill="#2563eb" stroke="#ffffff" stroke-width="2"/><circle cx="616.0" cy="403.6" r="6.5" fill="#2563eb" stroke="#ffffff" stroke-width="2"/><line x1="158.0" y1="60.0" x2="145.0" y2="79.0" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="145.0" y="79.0" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="end" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">酒店·汉庭（文三路）</text><text x="221.7" y="120.5" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">断桥·白堤</text><line x1="267.9" y1="182.3" x2="280.9" y2="201.3" stroke="#6b7280" stroke-width="0.8" opacity="0.5"/><text x="280.9" y="201.3" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">河坊街</text><text x="77.0" y="179.8" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">灵隐飞来峰</text><text x="309.1" y="170.2" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="start" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">杭州站 10/7 返程</text><text x="603.0" y="403.6" font-size="12.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" font-weight="500" fill="#04342C" text-anchor="end" dominant-baseline="central" style="paint-order:stroke" stroke="#f8faf9" stroke-width="3.5" stroke-linejoin="round">杭州南站 10/5 抵达</text><g transform="translate(640.0,34.0)"><circle cx="0" cy="0" r="14" fill="#ffffff" stroke="#bcd4cd" stroke-width="1"/><polygon points="0,-9.5 3.8,-0.5 0,-3 -3.8,-0.5" fill="#33544d"/><polygon points="0,9.5 3.8,0.5 0,3 -3.8,0.5" fill="#d3e0dc"/><text x="0" y="-18.5" font-size="9.5" font-weight="700" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280" text-anchor="middle">N</text></g><text x="620.0" y="37.5" font-size="10" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280" text-anchor="end">上北下南</text><text x="18" y="26" font-size="12.5" font-weight="600" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#33544d">杭州 · 数字＝该点 ↔ 酒店的直线距离</text><text x="18" y="44" font-size="10.5" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif" fill="#6b7280">白底数字框＝两点间直线距离，框位置就在这两点的连线中间</text></svg></div>
+<div class="legend">
+  <span><i style="background:#b45309"></i>酒店（文三路）</span>
+  <span><i style="background:#2563eb"></i>火车站</span>
+  <span><i style="background:#0d9488"></i>景点</span>
+  <span>⬤ 方格 = 实际 5 公里</span>
+</div>
+
+<div class="card">
+  <strong>玩什么（杭州实际可用时间：10/5 晚 + 10/6 全天 + 10/7 半天）</strong>
+  <table>
+    <tr><th>地点</th><th>预约</th><th>怎么安排</th></tr>
+    <tr><td>西湖 · 断桥 / 白堤 / 孤山</td><td>免费开放湖岸</td><td>10/5 傍晚 17:00–18:15 湖滨东岸看傍晚；10/7 上午 08:30–10:30 断桥—白堤—孤山选一小段</td></tr>
+    <tr><td>曲院风荷 / 苏堤 / 柳浪闻莺</td><td>免费</td><td><b>10/6 整日的默认路线</b>（漂流、灵隐都不成时走这条，全程免费不用抢）</td></tr>
+    <tr style="background:#fffbeb"><td>灵隐飞来峰</td><td>🅟 <b>必须实名分时预约 + 候补，现已免费</b><br>微信/支付宝「杭州灵隐飞来峰」</td><td><b>预备，不占时间块。</b>2025/12/1 起免票后取消现场登记，<b>免费反而更难进</b>。<b>候补成功就替换 10/6 上午</b>，否则走纯西湖线</td></tr>
+    <tr><td>河坊街 / 南宋御街</td><td>免费街区</td><td>10/5 晚 19:30 后短逛可选</td></tr>
+    <tr style="background:#fffbeb"><td>龙井峡漂流（临安）</td><td>🅟 <b>必须先打电话确认再买票</b><br>0571-63750573</td><td><b>预备，不占时间块。</b>电话确认能成就<b>整天替换 10/6</b>。注意是杭州<b>临安</b>的龙井峡，不是西湖边的龙井村</td></tr>
+  </table>
+  <div class="note">📝 <b>10/6 是四城里唯一不依赖外部确认的一天</b>：默认方案就是纯西湖线（曲院风荷 → 苏堤 → 6 元环湖船 → 西线秘境 → 南山路），<b>漂流和灵隐都只是挂起的备选</b>，成了再替换。<br>
+  👉 <b>完整版见 <a href="#s13">⑭ 杭州深度攻略</a></b>：336 篇实抓的热度榜、西湖三段怎么分、6 元环湖公交船秘境线、3 元水上巴士、10/6 漂流 vs 纯西湖两套方案。</div>
+</div>
+
+
+<h2 id="s3">④ 每日动线（全部照抄小红书高赞实测路线）</h2>
+<div class="src-note">📕 <b>这一节的路线不是我自己拼的。</b>每一天都对应一篇（或几篇）小红书高赞实测笔记，<b>点位顺序、停留节奏照抄原文</b>，我只做三件事：<b>① 把每段之间的通勤方式和价格填进去；② 接上你们的真实酒店位置和车次时间；③ 标注哪些点要预约。</b><br>
+用到的 8 篇：<b>1638 赞南京 12h</b>｜<b>3787 赞南京本地人一日游</b>（备选）｜<b>751 赞南京松弛浪漫线</b>｜<b>354 赞玄武湖不费腿线</b>｜<b>1583 赞苏州「只待一天」九站线</b>｜<b>5863 赞上海 2 日游</b> + <b>6227 赞南京路—外滩 18 点线</b> + <b>5411 赞武康路替代线</b>｜<b>3014 赞西湖 6 元船秘境线</b> + <b>1713 赞杭州老城 City Walk</b>。<b>每条 line 前面的绿色小标签就是它的出处。</b></div>
+
+<div class="card" id="pool" style="border-color:#fcd34d;background:#fffbeb">
+  <strong>🅟 预备项目池 —— 默认不排，但你要知道它存在</strong>
+  <p style="margin:8px 0 10px;font-size:13.5px">动线里的每一段时间块，现在装的都是「<b>到了就能玩</b>」的项目。下面这些则相反：它们<b>要么要抢预约、要么要电话确认</b>，所以<b>不占任何时间块</b>。<br>
+  但它们<b>不是被删掉了，是「挂起」</b>：哪天真抢到了 / 确认能成，就按「插在哪」那一列<b>替换掉对应时段</b>；抢不到也完全不影响行程 —— 你现在看到的动线就是最终版。</p>
+  <table>
+    <tr><th>预备项目</th><th>前置条件（怎么约 / 提前多久）</th><th>插在哪 · 替换什么</th><th>抢不到 / 不成的退路</th></tr>
+    <tr><td><b>南京博物院</b> <span class="cost">南京 · 免费</span></td><td>🚫 <b>必须线上实名预约</b><br>官方公众号 / 小程序，通常<b>提前 7 天放票，每日限额</b></td><td>插 <b>10/1 09:00–12:00</b>，替换颐和路 + 西桥（<b>约 3 小时</b>）</td><td>✅ 颐和路 + 先锋书店（同样免费、同样室内，<b>南京热度榜第一</b>）</td></tr>
+    <tr><td><b>中山陵</b> <span class="cost">南京 · 免费</span></td><td>🚫 <b>必须实名预约</b>（博爱陵园小程序），国庆基本秒空</td><td>插 <b>10/1 上午</b>，与明孝陵 / 美龄宫二选一（<b>约 3.5 小时</b>，含 392 级台阶）</td><td>✅ 明孝陵 + 美龄宫 + 陵园路梧桐（<b>买票就进</b>，同一片钟山景区）</td></tr>
+    <tr><td><b>遇难同胞纪念馆</b> <span class="cost">南京 · 免费</span></td><td>🚫 <b>必须预约</b>，本次未约上；国庆现场通常不放散客</td><td>插 <b>10/1 下午</b>，替换鸡鸣寺 + 城墙（<b>约 2 小时</b>）</td><td>✅ 鸡鸣寺 + 解放门城墙 + 玄武湖（30 元，买票就进）</td></tr>
+    <tr><td><b>苏州博物馆本馆</b> <span class="cost">苏州 · 免费</span></td><td>🚫 <b>免费但必须分时预约</b><br>「苏州博物馆全预约」小程序，<b>提前 7 天早 8 点放票</b></td><td>插 <b>10/3 09:20–10:50</b>，从平江路时间里切 1.5 小时（它在拙政园隔壁，动线零成本）</td><td>✅ 平江路全段慢走（<b>苏州热度榜第一 14127 赞</b>，这 1.5 小时本来就是它的）</td></tr>
+    <tr><td><b>苏博 / 拙政园夜游</b> <span class="cost">苏州</span></td><td>🚫 <b>需单独预约</b>，名额极少；国庆基本无望</td><td>插 <b>10/2 19:00–20:30</b>，替换十全街夜逛</td><td>✅ 十全街 + 双塔市集夜巷（本地人原话「不知道吃什么就去十全街」）</td></tr>
+    <tr><td><b>上海博物馆</b> <span class="cost">上海 · 免费</span></td><td>🚫 <b>需预约</b>（人民广场馆），国庆较紧张</td><td>插 <b>10/4 13:30–17:00</b>，替换陆家嘴；<b>或下雨时当室内兜底</b></td><td>✅ 徐家汇商圈 / 南京路商场（同样室内，不用抢）</td></tr>
+    <tr><td><b>灵隐飞来峰</b> <span class="cost">杭州 · 现免费</span></td><td>🚫 <b>实名分时预约 + 候补</b>。2025/12/1 免票后取消现场登记，<b>免费反而更难进</b></td><td>插 <b>10/6 上午</b>（约 3 小时），与漂流 / 西湖三选一</td><td>✅ 纯西湖线：苏堤 + 曲院风荷 + 南山路（<b>现在 10/6 的默认方案</b>）</td></tr>
+    <tr style="background:#eff6ff"><td><b>龙井峡漂流</b> <span class="cost">杭州临安 · 收费</span></td><td>📞 <b>必须先打电话确认再买票：0571-63750573</b><br>要问清：10/6 是否开漂 / 最晚检票时刻 / 单漂票是否含景交 / 2916 路班次 / 昌化返程末班</td><td><b>10/6 整天</b>（07:00 出发 → 15:00 结束 → 20:00 前回杭州）</td><td>✅ 西湖全天（曲院风荷 + 苏堤 + 南山路）。<b>预算里那 230–380 元/人也是挂起的，不去就不花</b></td></tr>
+  </table>
+  <div class="note" style="margin-bottom:0">✅ <b>判据只有一条：到了门口能不能当场买到票。</b>能买的（明孝陵、美龄宫、音乐台、城墙解放门、鸡鸣寺、拙政园、网师园、沧浪亭）就<b>直接排进时间块</b>；要抢的、要候补的、要电话确认的，全部进这个池子 —— <b>不占时间、不赌放票、不临场决定，但每一条的预约方式和插入位置都写在这儿了，想约随时能上手。</b></div>
+</div>
+
+
+<h3>9/30 周三｜20:20 落地南京 → 晚上就能玩一个：夫子庙秦淮河夜景</h3>
+<div class="ok" style="margin-bottom:10px">✅ <b>9/30 晚上不用浪费。</b>20:20 落地，22:40 前后能到酒店，<b>放完行李 23:00 出门，23:10 就站在秦淮河边</b> —— 酒店到夫子庙打车只要 <b>10 分钟 / 13 元</b>（3.1 公里，实测）。那天夜里正好没什么人，是全程拍照最舒服的一次。</div>
+<div class="timeline">
+  <div class="tl-row"><span class="tl-time">20:20</span><span>落地南京禄口机场 T1</span></div>
+  <div class="tl-row"><span class="tl-time">20:20–21:15</span><span>下机、取行李。<b>先上厕所、买水</b>，机场到市区还有 1 小时</span></div>
+  <div class="tl-row"><span class="tl-time">21:15–22:25</span><span>机场巴士 3 号线（夫子庙线）→ <b>金陵饭店站</b>，<span class="cost">30 元/人，约 1 小时 9 分</span></span></div>
+  <div class="tl-row"><span class="tl-time">22:25–22:40</span><span>下车走 600 米到酒店（石鼓路 58 号），<b>只办入住、放行李，不洗漱不收拾</b></span></div>
+  <div class="tl-row"><span class="tl-time">22:40–22:55</span><span>打车 酒店 → <b>夫子庙 · 秦淮河</b>，<span class="cost">10 分钟 / 13 元</span>（地铁 1 号线三山街站 26 分钟 / 2 元，但夜里没必要省这 10 块）</span></div>
+  <div class="tl-row"><span class="tl-time">22:55–23:50</span><span><b>秦淮河夜景</b>：文德桥 → 秦淮画舫码头 → 夫子庙牌坊 → 江南贡院门口 → 沿河往东走。<b>全程就是散步看灯，开放式街区不收费、不用预约</b></span></div>
+  <div class="tl-row"><span class="tl-time">23:50–24:05</span><span>打车回酒店 <span class="cost">13 元</span>。回程别硬等，直接叫车；实在叫不到就走到三山街站坐 1 号线（末班约 23:30 前后，<b>以当晚为准</b>）</span></div>
+  <div class="tl-row gap"><span class="tl-time">00:10</span><span>睡。<b>明天 10/1 是南京唯一一个整天</b>，别熬太晚</span></div>
+</div>
+<div class="note">📝 <b>为什么选夫子庙不选别的</b>：① 离酒店只有 3.1 公里，是夜里唯一来得及的；② <b>开放式街区、不收费、不用预约</b>（正好符合你「不排要预约的」这条）；③ 国庆夜景灯光会延长，人也比白天少一大半；④ 它本来就在你行程里，等于<b>提前消化掉，10/1 晚上就不用再跑一趟</b>。<br>
+🍜 <b>吃的别在夫子庙解决</b>（全网共识：商业化、贵、不正宗）。饿的话回酒店路上在新街口买，或者 10/1 去老门东吃。</div>
+<div class="warn">⚠️ <b>三个前置条件，不满足就跳过直接睡：</b>① 落地晚于 21:30；② 机场巴士排队超过 30 分钟（那就打车，<b>4 人分摊约 30–40 元/人，比巴士贵 10 块但省 40 分钟</b>）；③ 有人在飞机上累坏了。<b>9/30 只是开胃，10/1 才是正餐，别为了「多玩一个」把第二天搞崩。</b><br>
+⚠️ <b>下单酒店时备注「晚到入住」</b>，避免 22:40 到店被判 no-show。<b>行李别打开，只放进门</b>。</div>
+
+<h3>10/1 周四｜南京唯一整天</h3>
+<div class="src-note">📕 这条线<b>不是我自己拼的</b>，是照抄小红书 <b>1638 赞「南京12h · 适合i人的旅行攻略（附时间路线）」</b>的实测路线和时刻；<b>下午那段补全用了 751 赞「南京宝藏citywalk路线·既松弛又浪漫」</b>（同一片区域，笔记原顺序一致），<b>玄武湖日落段用了 354 赞「不费腿 · 玄武湖懒人文艺路线」</b>。我只负责把每段之间的通勤时间和价格填进去。</div>
+<div class="timeline">
+  <div class="tl-row"><span class="tl-time">08:30–09:20</span><span><span class="src">1638赞原路线①</span><b>三七八巷</b>吃早饭 —— 汤包、馄饨、小元宵。<b>原笔记就把全天起点定在这里</b></span></div>
+  <div class="tl-row"><span class="tl-time">09:30–11:00</span><span><span class="src">1638赞原路线②</span>骑车 / 步行去旁边的<b>老门东</b>（笔记原话：几条街都挨着）。9/30 晚上只看了河边，<b>白天的巷子留在这里逛</b></span></div>
+  <div class="tl-row opt"><span class="tl-time">11:00–13:00</span><span><span class="opt-badge">🅟 预备</span><b>若约到南京博物院 → 替换下面红庙 + 一枝园这两行</b>（原笔记这一段是去看展，属于室内，正好是替代位）。<b>没约到就当这行不存在</b> —— 详见 <a href="#pool">预备项目池</a></span></div>
+  <div class="tl-row"><span class="tl-time">12:00–12:45</span><span><span class="src">1638赞原路线③</span>打车去<b>红庙</b>吃午饭 —— 笔记原话「本地人会去的红庙，有不少一人食的地方」<span class="cost">30–45 元/人</span></span></div>
+  <div class="tl-row"><span class="tl-time">13:00–14:00</span><span><span class="src">1638赞原路线④</span><b>一枝园附近 citywalk</b>（咖啡 / 街巷，笔记给的缓冲段）</span></div>
+  <div class="tl-row"><span class="tl-time">14:40–15:40</span><span><span class="src">1638赞原路线⑤+751赞</span>骑车去<b>陶谷新村</b>逛小店。<b>751 赞那篇的完整顺序</b>：<b>云南路地铁口 → 北京西路 → 颐和路 → 西桥 → 金银街 → 南秀村 → 陶谷新村 → 先锋书店（五台山店）</b>，全程约 5 公里，<b>笔记建议下午出发、走到先锋书店刚好傍晚</b>。体力够就把南秀村、金银街也串上</span></div>
+  <div class="tl-row"><span class="tl-time">15:50–16:50</span><span><span class="src">1638赞原路线⑥</span><b>颐和路</b> —— <b>先上先锋书店二楼拍公馆区全景</b>，再下来走走（笔记强调这一步）<br>⚠️ 751 赞那篇的提醒：<b>歪脖子树常年要排队，别死等一棵树</b>，旁边每棵树都好拍</span></div>
+  <div class="tl-row"><span class="tl-time">16:50–17:20</span><span><span class="src">1638赞原路线⑦</span>步行到<b>西桥</b>，拍紫峰大厦 + 老巷子同框（<b>两篇高赞路线都把西桥排在颐和路之后</b>）</span></div>
+  <div class="tl-row"><span class="tl-time">17:20–19:00</span><span><span class="src">1638赞原路线⑧+354赞</span>打车定位<b>岗子村</b>进<b>玄武湖</b>看日落。<b>354 赞「不费腿」线的顺序</b>：<b>玄武门入园 → 先锋书店（玄武湖店）→ 情侣园西式教堂 → 听风水岸看日落</b>（全程平路约 2 小时，笔记说日落约 18:30，提前半小时占位）</span></div>
+  <div class="tl-row gap"><span class="tl-time">19:00–20:30</span><span><span class="src">1638赞原路线⑨</span>出湖到对面<b>锁金村</b>吃晚饭 —— 鸡蛋饼 + 鸭血粉丝（<b>原笔记的收尾就定在锁金村</b>，比回市区吃便宜也更地道）<span class="cost">25–40 元/人</span>。之后打车回酒店 <span class="cost">约 15 分</span></span></div>
+</div>
+<div class="ok">✅ <b>这条路线整篇没有一个需要预约的点</b>，而且原作者是实走 12 小时写下的时刻表 —— 比我按地图拼的版本更扛现实。<b>我没改动它的顺序</b>，只在每段之间补了通勤方式和花费。</div>
+<div class="warn">🔁 <b>想换一条完全不同的：3787 赞「南京本地人推荐的一日游路线」</b> —— <b>朝天宫 → 熙南里 → 愚园 → 大报恩寺遗址景区 → 南京城墙博物馆 → 老门东 → 瞻园 → 夫子庙</b>。<b>笔记原话：「这些地方都靠在一起，走走逛逛拍照不费脚」</b>，主打金陵历史线（城南片区），全程不用预约。<b>缺点：它把夫子庙排在最后，而你 9/30 晚上已经去过河边了</b>，晚上这段会重复。<br>
+☔ 下雨：1638 赞线受影响最大的是陶谷新村—颐和路这段（梧桐道淋雨不好走），<b>按笔记给的思路压缩成一枝园 + 红庙吃吃逛逛</b>；玄武湖取消，改去<b>先锋书店五台山店</b>（751 赞线的终点，室内）。</div>
+
+<h3>10/2 周五｜早车到苏州 → 城南步行圈 → 十全街夜逛</h3>
+<div class="src-note">📕 下午这段摘自小红书 <b>1583 赞「如果在苏州只待一天，请直接复制这条路线‼️」</b>的<b>第 5、6 站</b>（它的完整九站顺序是 <b>拙政园 → 平江路 → 观前街 → 双塔市集 → 网师园 → 十全街 → 苏州中心 → 东方之门 → 金鸡湖</b>）。按到达时间和酒店位置，<b>只切城南这一段，顺序照抄不重排</b>。</div>
+<div class="timeline">
+  <div class="tl-row"><span class="tl-time">05:30–06:00</span><span>起床、退房（早餐前一晚备好）</span></div>
+  <div class="tl-row"><span class="tl-time">06:05–06:30</span><span>地铁 1 号线新街口 → 南京站，<b>22 分钟，3 元，步行 581 米</b></span></div>
+  <div class="tl-row gap"><span class="tl-time">06:35–07:35</span><span><b>只留安检候车，不排餐饮游玩</b></span></div>
+  <div class="tl-row"><span class="tl-time">07:35–10:29</span><span>T27 南京站 → 苏州站</span></div>
+  <div class="tl-row gap"><span class="tl-time">10:29–11:00</span><span>出站、转乘缓冲</span></div>
+  <div class="tl-row"><span class="tl-time">11:00–11:30</span><span>苏州站 → 酒店：4 号线（苏州火车站 2A 口，同里方向 5 站）→ 南门 → 换 5 号线 1 站 → 南园北路 → 步行 393 m。<b>26 分钟，2 元</b></span></div>
+  <div class="tl-row"><span class="tl-time">11:30–12:40</span><span>酒店寄存行李 + 午餐（南门 / 十全街一带，苏式面、小笼）<span class="cost">20–35 元/人</span></span></div>
+  <div class="tl-row"><span class="tl-time">13:00–14:00</span><span><span class="src">1583赞 · 第5站</span><b>网师园</b>（出门步行 527 m，7 分钟）。笔记原话：<b>「小巧精致的小而美园林，以小中见大著称，傍晚的夜花园更是一绝」</b><span class="cost">约 30–40 元</span></span></div>
+  <div class="tl-row"><span class="tl-time">14:00–15:00</span><span><b>沧浪亭</b>（步行 682 m，9 分钟）<span class="cost">约 15–20 元</span>。<b>这是本段唯一不在那条路线里的点</b> —— 离酒店只有 682 m，和网师园同档次、票价只要一半，顺路补上</span></div>
+  <div class="tl-row"><span class="tl-time">15:00–17:30</span><span><span class="src">1583赞 · 第6站</span><b>十全街</b>慢走 + 咖啡 / 小店。笔记原话：<b>「年轻人的潮流聚集地，网红咖啡馆、brunch 店、中古店林立，从早吃到晚都不重样」</b>。就在网师园门口，走累了随时能回酒店</span></div>
+  <div class="tl-row"><span class="tl-time">17:30–18:30</span><span>回酒店休整，晚餐 <span class="cost">40–55 元/人</span></span></div>
+  <div class="tl-row opt"><span class="tl-time">19:00–20:30</span><span><span class="opt-badge">🅟 预备</span><b>若抢到苏博夜游 / 拙政园夜游 → 替换下面这行</b>（需单独预约，名额极少）。<b>没抢到就当这行不存在</b> —— 详见 <a href="#pool">预备项目池</a></span></div>
+  <div class="tl-row"><span class="tl-time">19:00–20:30</span><span><span class="src">1583赞 · 第4站</span><b>十全街夜逛</b>（步行 8 分钟）。想加一段就去<b>双塔市集 → 叶家弄夜巷</b> —— 双塔市集是这条路线里的第 4 站，笔记形容它<b>「藏在市井里的美学市集，网红蛋饼、糖水铺、手作咖啡，本地人也爱逛」</b>；再接叶家弄夜巷，就是小红书那句「姑苏幽巷灯影浮」</span></div>
+  <div class="tl-row gap"><span class="tl-time">21:00 前</span><span>回酒店。<b>明天 05:20 要起床赶拙政园早场</b>，别熬</span></div>
+</div>
+<div class="warn">🚫 <b>山塘街已按小红书劝退移出。</b>3534 赞的国庆专篇第一条就是「不要拜访七里山塘」—— 它离酒店单程 36 分钟，来回 1 小时 10 分，国庆夜景基本是人贴人。<b>省下的这 1 小时换成一个不用赶的早晨</b>，比什么都值。详见 <a href="#s11">⑫ 苏州深度攻略 · ⑥</a>。</div>
+<div class="note">📝 如果白天那两个园子逛得意犹未尽，<b>可园（25 元，人少很美）和艺圃（10 元）</b>都在城南，是同一档的备选。</div>
+<div class="warn">☔ 下雨：网师园 / 沧浪亭照走（园林有廊），十全街缩短（钻进咖啡店），晚上直接回酒店休息。</div>
+
+<h3>10/3 周六｜拙政园早场 → 平江路 → 上海 → 豫园夜景</h3>
+<div class="src-note">📕 上午这段是小红书 <b>1583 赞「如果在苏州只待一天，请直接复制这条路线‼️」的第 1、2 站</b>（<b>拙政园 → 平江路</b>，第 3 站观前街也在顺路上，看时间取舍）；<b>园内怎么拍</b>参考 2690 赞「苏州一日游 citywalk · 不走回头路」给出的两个必打卡机位。</div>
+<div class="timeline">
+  <div class="tl-row"><span class="tl-time">05:20–06:00</span><span>起床、<b>退房并把行李寄存酒店前台</b>（中午回来取）</span></div>
+  <div class="tl-row"><span class="tl-time">06:00–06:25</span><span>打车 酒店 → 拙政园，<b>24 分钟 / 18 元 / 6.7 公里</b>（4 人分摊 ≈ 4.5 元。05:20 起床就是为了赶这个 06:45 早场，早场人也最少）</span></div>
+  <div class="tl-row gap"><span class="tl-time">06:45–08:40</span><span><span class="src">1583赞 · 第1站</span><b>拙政园早场</b>（门票 80 元，提前 1–7 天实名预约）。2690 赞笔记点名的两个机位：<b>卅六鸳鸯馆</b>（海棠菱花玻璃，蓝白光影）和 <b>海棠春坞</b>（东侧长廊透过窗景能拍到北寺塔同框）</span></div>
+  <div class="tl-row gap"><span class="tl-time">09:00–09:20</span><span><span class="src">1583赞 · 第2站</span>拙政园出来步行约 1 公里到 <b>平江路</b>（笔记形容它<b>「苏州古城的活化石，青石板路、小桥流水、白墙黛瓦」</b>）。<b>苏博挂在预备池里，这 1.5 小时默认全给平江路</b>。<b>若还有余力</b>，第 3 站观前街（陆稿荐、黄天源、采芝斋老字号一条街）就在附近，但<b>必须在 11:10 前抽身去酒店取行李</b></span></div>
+  <div class="tl-row opt"><span class="tl-time">09:20–10:50</span><span><span class="opt-badge">🅟 预备</span><b>若约到苏州博物馆本馆 → 从下面这段里切走 1.5 小时</b>（它在拙政园隔壁，提前 7 天早 8 点放票）。<b>没约到就当这行不存在</b>，平江路完整逛 —— 详见 <a href="#pool">预备项目池</a></span></div>
+  <div class="tl-row"><span class="tl-time">09:20–11:00</span><span><b>平江路慢走</b>：碑亭 → 手摇船码头 → 齐云楼（一楼临河座位最出片）→ 北段。中途找家店坐下来吃早点 <span class="cost">15–25 元/人</span></span></div>
+  <div class="tl-row"><span class="tl-time">11:10–11:50</span><span>平江路 → 酒店取行李：公交 5 路约 36 分钟（苏州博物馆站上车）/ 打车 24 分钟 18 元</span></div>
+  <div class="tl-row gap"><span class="tl-time">11:50–12:20</span><span>酒店 → 苏州站（5 号线 → 4 号线，<b>26 分钟，2 元，步行 548 米</b>）</span></div>
+  <div class="tl-row gap"><span class="tl-time">12:20–13:44</span><span><b>只留安检候车</b>（余量充足，宁可早到）</span></div>
+  <div class="tl-row"><span class="tl-time">13:44–14:46</span><span>K371 苏州站 → 上海站</span></div>
+  <div class="tl-row"><span class="tl-time">14:46–15:15</span><span>出站、走到上海站南广场出租车上车点</span></div>
+  <div class="tl-row"><span class="tl-time">15:15–15:40</span><span>上海站 → 酒店：<b>打车 24 分钟 / 28 元</b>（4 人分摊 7 元/人）。地铁要 42 分钟 + 走 1.4 公里，拖着行李不值</span></div>
+  <div class="tl-row"><span class="tl-time">15:40–17:00</span><span>办入住（富南大厦 4 楼）、放行李。<b>先看房再刷卡</b>，然后休息 30 分钟缓一缓</span></div>
+  <div class="tl-row"><span class="tl-time">17:00–18:15</span><span>晚餐：陆家浜路 / 南车站路一带本地小馆 <span class="cost">25–40 元/人</span></span></div>
+  <div class="tl-row"><span class="tl-time">18:30–20:30</span><span><b>豫园 · 城隍庙夜景</b>：<b>打车 9 分钟 / 14 元</b>（4 人 3.5 元/人），或沿老城厢步行 2.6 公里 / 22 分钟</span></div>
+  <div class="tl-row gap"><span class="tl-time">21:00 后</span><span>回酒店休整。<b>想当晚直接看外滩也行</b>（打车 13 分 / 16 元），但落地当天带行李，建议留给 10/4</span></div>
+</div>
+<div class="note">📝 <b>10/3 全程不用寄存行李</b> —— 出站直接打车到酒店。<b>豫园离酒店只有 2.6 公里，这是住这家最直接的一个红利</b>：落地当晚不用硬撑着跨半个上海去看外滩。</div>
+<div class="warn">☔ 下雨：拙政园有廊照走；平江路缩短（找家临河店坐下来）；豫园改成「商场内 + 打车往返」，别在露天排小笼。</div>
+
+<h3>10/4 周日｜上海整天（武康路 → 陆家嘴 → 南京路 → 外滩）</h3>
+<div class="src-note">📕 这一天是由小红书两篇组合而成的，<b>不是我自己拼的</b>：<br>
+① <b>5863 赞「上海2日游 · 懒人版不走冤枉路」</b> —— <b>Day1：南京路步行街 → 东方明珠 → 陆家嘴 → 国金中心 → 外滩 → 外滩码头</b>；<b>Day2：武康路 → 新天地 → 愚园路 → 豫园 → 城隍庙</b>。我们只有一天，<b>上午取它的 Day2 前段、下午取它的 Day1，原顺序不动</b>。<br>
+② 南京路到外滩这一段，用 <b>6227 赞「南京路-外滩 citywalk 逛吃拍 ‖ 附路线」</b>的<b>完整 18 个点</b>落地（笔记原话：「20 个经典打卡点一次刷完，从南京路逛到外滩，2 公里不回头」）。</div>
+<div class="timeline">
+  <div class="tl-row"><span class="tl-time">08:00–08:45</span><span>早餐：陆家浜路沿线早点铺 <span class="cost">15–25 元/人</span></span></div>
+  <div class="tl-row"><span class="tl-time">08:45–09:05</span><span>酒店 → <b>武康大楼</b>：<b>打车 17 分钟 / 21 元</b>（4 人 5 元/人）</span></div>
+  <div class="tl-row"><span class="tl-time">09:05–12:00</span><span><span class="src">5863赞 Day2-①</span><b>武康大楼 → 武康路 → 安福路</b>：笔记形容<b>「梧桐铺满小路，小店散步慢悠悠」「安福路是潮人聚集地，咖啡店买手店扎堆」</b>。这一段全靠走，约 3 公里，<b>不堵居民门口</b></span></div>
+  <div class="tl-row opt"><span class="tl-time">09:05–12:00</span><span><span class="opt-badge">🅟 换线</span><b>嫌武康路人多？换成 5411 赞「比起武康路，我更喜欢上海这条 Citywalk 路线」</b>：<b>陕西南路地铁站 7 号口 → 襄阳南路 → 复兴中路 → 永康路 → 太原路 → 永嘉路</b>。笔记原话<b>「沿途也有好看的梧桐街道，墙上和马路上都是光影斑驳，真的美得像电影」</b>，还点了四家店：<b>池仔记肠粉王、威皇广福和（醉鸡煲，要提前取号）、Day dreaming（窗户很好看）、coffee is（有插座可办公）</b></span></div>
+  <div class="tl-row"><span class="tl-time">12:00–13:30</span><span>午餐：安福路 / 淮海中路一带 <span class="cost">30–45 元/人</span></span></div>
+  <div class="tl-row"><span class="tl-time">13:30–13:55</span><span>武康路 → <b>陆家嘴</b>：<b>打车 20 分钟 / 32 元</b>（延安高架 + 隧道，4 人 8 元/人）</span></div>
+  <div class="tl-row opt"><span class="tl-time">13:30–17:00</span><span><span class="opt-badge">🅟 预备</span><b>若约到上海博物馆 → 替换下面陆家嘴这段</b>（人民广场馆，室内）；<b>下雨天它就是最好的兜底</b>。<b>没约到就当这行不存在</b> —— 详见 <a href="#pool">预备项目池</a></span></div>
+  <div class="tl-row"><span class="tl-time">14:00–17:00</span><span><span class="src">5863赞 Day1-②③④</span><b>东方明珠 → 陆家嘴 → 国金中心</b>：地面步行 + 滨江大道看对岸外滩天际线，<b>不上付费观景层</b>（省钱，笔记也没要求登塔）</span></div>
+  <div class="tl-row"><span class="tl-time">17:00–17:20</span><span>陆家嘴 → 南京东路：<b>地铁 2 号线 1 站</b>（3 元），也可走外滩观光隧道</span></div>
+  <div class="tl-row"><span class="tl-time">17:20–19:00</span><span><span class="src">5863赞 Day1-①+6227赞全段</span><b>南京路步行街</b>（地铁人民广场站 19 号口出）。<b>6227 赞笔记按这个顺序刷，2 公里不回头</b>：<br>
+    W.M → 乐高 → 泡泡玛特 → 墨格 → M&amp;M 豆 → <b>沈大成</b> → Top Toy → 名创优品 → <b>渝囡囡沪式火锅</b> → <b>石库制饼</b> → <b>大白兔</b> → 三丽鸥 → 星星人冰棍 → 新丸中心 → <b>和平饭店</b> → 外滩亮灯观景点 → 外滩观景台<br>
+    晚餐在这一段的店里解决 <span class="cost">35–50 元/人</span></span></div>
+  <div class="tl-row"><span class="tl-time">19:00–21:00</span><span><span class="src">5863赞 Day1-⑤⑥</span><b>外滩夜景 → 外滩码头</b>：从南京路东头就是外滩。<b>22:00 关灯</b>，21:00 前必须站在江边</span></div>
+  <div class="tl-row gap"><span class="tl-time">21:00–21:35</span><span>回酒店：<b>走到 10 号线南京东路站坐地铁</b>（37 分 / 3 元）比打车稳 —— 国庆散场时外滩一带根本打不到车</span></div>
+</div>
+<div class="ok">✅ <b>这一天的通勤全靠打车，单趟 15–25 分钟，4 人分摊每人 5–8 元。</b>路线走向即 5863 赞笔记的原顺序，我没有为了「更顺」去重排。</div>
+<div class="warn">☔ 下雨：上午武康路（或 5411 赞那条替代线）<b>改成徐家汇商圈室内 / 上海博物馆</b>；陆家嘴走滨江有顶棚段 + 正大广场；南京路—外滩本来就是逛街，<b>6227 赞那串店名大部分在室内</b>，反而照走。打车需求会暴涨，提前 20 分钟叫车。</div>
+
+<h3>10/5 周一｜上海 → 杭州</h3>
+<div class="timeline">
+  <div class="tl-row"><span class="tl-time">07:30–08:30</span><span>早餐</span></div>
+  <div class="tl-row"><span class="tl-time">08:30–10:00</span><span>收拾、退房。<b>10:00 出门即可</b>（9 号线直达，去松江站 1 小时 18 分）</span></div>
+  <div class="tl-row"><span class="tl-time">10:00–11:18</span><span>酒店 → <b>上海松江站</b>：步行 448 米到陆家浜路 6 口 → <b>地铁 9 号线直达 21 站</b>，<b>1 小时 18 分 / 7 元 / 全程只走 485 米</b> ⭐</span></div>
+  <div class="tl-row gap"><span class="tl-time">11:18–12:20</span><span><b>只留安检候车</b>（1 小时余量，足够）</span></div>
+  <div class="tl-row"><span class="tl-time">12:20–14:08</span><span>K575 上海松江站 → 杭州南站（午餐车上解决）</span></div>
+  <div class="tl-row gap"><span class="tl-time">14:08–15:08</span><span>杭州南站出站、转乘缓冲</span></div>
+  <div class="tl-row"><span class="tl-time">15:08–16:20</span><span>去酒店：<b>杭州南站 → 文三路酒店 1 小时 11 分，6 元</b></span></div>
+  <div class="tl-row"><span class="tl-time">17:00–18:15</span><span>湖滨东岸看湖面与傍晚光线</span></div>
+  <div class="tl-row"><span class="tl-time">18:15–19:30</span><span>晚餐 <span class="cost">40–55 元/人</span></span></div>
+  <div class="tl-row gap"><span class="tl-time">19:30 后</span><span><span class="src">1713赞 · 杭州老城线</span>可选的<b>杭州老城 City Walk</b>：<b>鼓楼 → 大井巷 → 南宋御街 → 河坊街</b>。笔记里点名的店：<b>南宋书房</b>（古风书店，隔壁南宋邮局有杭州文创和国风冰箱贴）、<b>怪小妹</b>（巷子里的小众手作）、<b>布兰兔的植物庄园</b>（英式茶生活）、<b>金石工坊</b>（满屋招财猫）、<b>摩登巴赫香氛艺术馆</b>。<b>累了就直接跳过回酒店</b>，确认次日安排后早睡</span></div>
+</div>
+<div class="warn">⚠️ 杭州南站不是杭州站（城站）、也不是杭州东站。别走错站。</div>
+<div class="warn">⚠️ 10/5 是周一，<b>地铁 9 号线早高峰约到 09:30</b>。你 10:00 出发已经错峰，且出城方向（往松江）不挤。真担心的话可以打车到松江站（约 37 公里 / 90 元左右 / 约 50 分钟），但没必要。</div>
+
+<h3>10/6 周二｜杭州整日（默认：西湖西线秘境）</h3>
+<div class="src-note">📕 这天<b>照抄小红书 3014 赞「6元就可以坐西湖游船，这条秘境路线太爱了❗」</b>的<b>完整九段顺序</b>，一个点没改、一个点没加：<br>
+<b>曲院风荷4号门 →（船 6 元）→ 茅家埠 →（船 8 元）→ 花港观鱼 → 乌龟潭 → 浴鹄湾 → 太子湾 → 净慈寺</b><br>
+笔记原话：<b>「探寻以前只有摇橹船才能到的西里湖秘境，沿途还能远眺雷峰塔、三潭印月和城隍阁，人少景美」</b>。</div>
+<div class="timeline">
+  <div class="tl-row opt"><span class="tl-time">07:00–20:00</span><span><span class="opt-badge">🅟 预备</span><b>若漂流电话确认能成 → 整天替换成漂流</b>（06:30 起、07:00 出发、15:00 结束、20:00 前回杭州）；<b>若灵隐候补成功 → 上午换成灵隐</b>。<b>两个都没成，就当这行不存在</b>，走下面这条西湖线 —— 详见 <a href="#pool">预备项目池</a></span></div>
+  <div class="tl-row"><span class="tl-time">08:00–09:00</span><span>早餐 <span class="cost">15–25 元/人</span>。<b>不用早起</b> —— 默认方案全天都在西湖西线，没有必须赶的点</span></div>
+  <div class="tl-row"><span class="tl-time">09:00–09:40</span><span><span class="src">3014赞 · 起点</span>去<b>曲院风荷 4 号门</b>。笔记给的走法：<b>地铁西湖文化广场站出，坐公交 318 路到「杭州花圃」，对面就是 4 号门</b>；从杭州东站则是地铁 1 号线到武林广场换 318</span></div>
+  <div class="tl-row"><span class="tl-time">09:40–10:20</span><span><span class="src">3014赞 · 找码头</span><b>进 4 号门往右手边走 5 分钟到上船点</b>（找不到就导航「<b>中美友谊井</b>」）。笔记原话：<b>「这个码头平时人很少，电子屏上可以看到船余位和到达时间」</b></span></div>
+  <div class="tl-row"><span class="tl-time">10:20–11:00</span><span><span class="src">3014赞 · 第1段船</span>坐<b>西湖公交船（6 元）</b>到<b>茅家埠</b> —— 笔记：<b>「又叫公交船，顺时针环绕西湖一圈，每个站点可以上下船，每站 6–8 元」</b></span></div>
+  <div class="tl-row"><span class="tl-time">11:00–12:00</span><span><span class="src">3014赞 · 第3站</span><b>茅家埠</b>：笔记形容<b>「静谧清幽，是我们去不厌的宝藏遛娃地」</b>。这一段是西湖里的西湖，人最少</span></div>
+  <div class="tl-row"><span class="tl-time">12:00–12:30</span><span><span class="src">3014赞 · 第2段船</span>再买一站（<b>8 元</b>）到<b>花港观鱼</b> —— <b>「沿途可以欣赏雷峰塔、三潭印月和城隍阁」</b>，等于把西湖三大标志从水上看了一遍</span></div>
+  <div class="tl-row"><span class="tl-time">12:30–13:30</span><span><span class="src">3014赞 · 第4站</span><b>花港观鱼</b> + 午餐（赏花、看鸳鸯、喂锦鲤），笔记：<b>从西门出，步行 5 分钟到乌龟潭</b> <span class="cost">40–60 元/人</span></span></div>
+  <div class="tl-row"><span class="tl-time">13:30–14:15</span><span><span class="src">3014赞 · 第5站</span><b>乌龟潭</b>：<b>「溪水潺潺，耳边充斥着鸟叫缠绵，还能看到来往的摇橹船」</b></span></div>
+  <div class="tl-row"><span class="tl-time">14:15–15:00</span><span><span class="src">3014赞 · 第6站</span><b>浴鹄湾</b>：<b>「古风的长廊，静谧的湖水」</b></span></div>
+  <div class="tl-row"><span class="tl-time">15:00–15:45</span><span><span class="src">3014赞 · 第7站</span><b>太子湾公园</b></span></div>
+  <div class="tl-row"><span class="tl-time">15:45–16:30</span><span><span class="src">3014赞 · 终点</span><b>净慈寺</b>（<b>门票 10 元</b>）：笔记原话<b>「就在雷峰塔对面，这里更显清幽，可以打卡南屏晚钟，还能拍到雷峰塔的绝美机位」</b></span></div>
+  <div class="tl-row gap"><span class="tl-time">16:30–19:00</span><span><span class="src">3014赞 · 收尾</span>笔记给的两个收尾选项：<b>① 在雷峰塔门口坐观光车（10 元/站）坐两站到断桥；② 坐公交去长桥公园看西湖日落</b>。晚餐在附近解决 <span class="cost">40–55 元/人</span>，19:30 前回酒店收行李</span></div>
+</div>
+<div class="warn">🔁 <b>想换另外两条高赞西湖线（都实测过，可直接替换这一天）：</b><br>
+· <b>2412 赞「别硬走 15 公里 · 懒人精简路线」</b> —— <b>柳浪闻莺 → 长桥公园 → 雷峰塔外围 → 花港观鱼 → 苏堤一小段 → 曲院风荷 → 北山街看日落</b>。原句要点：<b>「不用每个景点都进去，边走边看氛围感更好」「下午 4 点左右出发，刚好赶上湖边绝美日落」「湖边共享单车短途代步，节省大量体力」</b>。<br>
+· <b>8378 赞「西湖半日游 · 低精力 + 带父母少走路路线」</b> —— <b>二公园码头坐船（70 元）→ 三潭映月 → 花港观鱼 → 步行 15 分钟到雷峰塔（登塔 40 元）→ 雷峰塔门口坐观光车（40 元）到断桥</b>。<b>这条要花约 150 元/人，但全程几乎不用走。</b><br>
+☔ 下雨：西线树密、有长廊，反而适合雨天；<b>唯一变数是船可能停航</b> —— 那就把两段船换成步行/观光车，点位顺序不变。</div>
+<div class="pend" style="display:block;padding:10px 14px;margin:12px 0">
+  ⏳ <b>漂流若要成行，这些必须先打电话核实（0571-63750573）</b>：10/6 是否开漂、最晚检票时刻、单漂票是否含景交、2916 路在「大龙湾路口」的经过时刻、昌化回杭州的末班。<b>预算里那 230–380 元/人是挂起的，不去就不花。</b>
+</div>
+
+<h3>10/7 周三｜湖边收尾，17:40 卧铺返校</h3>
+<div class="timeline">
+  <div class="tl-row"><span class="tl-time">07:30–08:30</span><span>早餐、退房寄存，核对返程票</span></div>
+  <div class="tl-row"><span class="tl-time">08:30–10:30</span><span><span class="src">2412赞懒人精简线</span><b>断桥 → 白堤 → 孤山</b>选一小段（前一天累了就睡到自然醒）。<b>2412 赞「别硬走 15 公里 · 懒人精简路线」的原话：「断桥周末节假日人巨多，路过打卡即可不用久留」</b> —— 它给的方向是<b>柳浪闻莺 → 长桥公园 → 雷峰塔外围 → 花港观鱼 → 苏堤一小段 → 曲院风荷 → 北山街看日落</b>，上午只能取其<b>中段一小节</b>，别贪多</span></div>
+  <div class="tl-row"><span class="tl-time">11:00–12:00</span><span>坐下吃午餐 <span class="cost">25–45 元/人</span>（奎元馆解放路店，片儿川先看价）</span></div>
+  <div class="tl-row"><span class="tl-time">12:00–14:00</span><span>买车上食物、酒店附近休息</span></div>
+  <div class="tl-row"><span class="tl-time">14:00–15:00</span><span>回酒店取行李</span></div>
+  <div class="tl-row"><span class="tl-time">15:00–16:00</span><span>去火车站：<b>文三路酒店 → 杭州站（城站）35 分，3 元</b></span></div>
+  <div class="tl-row gap"><span class="tl-time">16:40–17:40</span><span><b>只留安检候车，不排任何餐饮购物</b></span></div>
+  <div class="tl-row"><span class="tl-time">17:40</span><span><b>卧铺发车返校</b></span></div>
+</div>
+<div class="pend" style="display:block;padding:10px 14px;margin:12px 0">
+  📌 <b>10/7 17:40 卧铺发车</b>，去车站的时间按<b>杭州站（城站）</b>排：文三路酒店 → 杭州站 35 分 / 3 元。<b>出发前 2 天务必核对票面站名</b> —— 若是杭州东站或杭州南站，去站时间要重算（东站、南站都更远）。
+</div>
+
+<h2 id="s4">⑤ 通勤实测表</h2>
+<p class="verified">🔎 以下数据于 2026-09-26 通过腾讯地图路线规划接口实查，均为公共交通方案。国庆期间会有延误，请按此留余量而不是按此卡点。</p>
+<table>
+  <tr><th>路段</th><th>方式</th><th>用时</th><th>费用</th><th>步行</th></tr>
+  <tr><td>南京酒店 → 南京站</td><td>地铁 1 号线直达</td><td><b>22 分</b></td><td>3 元</td><td>581 m</td></tr>
+  <tr><td>禄口机场 T1 → 南京酒店</td><td>机场巴士 3 号线 → 金陵饭店</td><td>1 小时 9 分</td><td>30 元</td><td>688 m</td></tr>
+  <tr style="background:#f0fdfa"><td><b>南京酒店 → 夫子庙 · 秦淮河</b>（9/30 夜游）</td><td><b>打车</b> / 地铁 1 号线三山街站</td><td><b>10 分</b> / 26 分</td><td><b>13 元</b> / 2 元</td><td>3.1 km</td></tr>
+  <tr><td>南京酒店 → 中山陵</td><td>地铁 2 号线 + 步行</td><td>58 分–1 小时 2 分</td><td>3–13 元</td><td>1.6–2.7 km</td></tr>
+  <tr style="background:#f0fdfa"><td>苏州站 → 苏州酒店</td><td>地铁 4 号线 → 5 号线</td><td><b>26 分</b></td><td>2 元</td><td>540 m</td></tr>
+  <tr style="background:#f0fdfa"><td>苏州酒店 → 苏州站</td><td>地铁 5 号线 → 4 号线</td><td><b>26 分</b></td><td>2 元</td><td>548 m</td></tr>
+  <tr><td>苏州酒店 → 网师园</td><td><b>步行</b></td><td>7 分</td><td>0 元</td><td>527 m</td></tr>
+  <tr><td>苏州酒店 → 沧浪亭</td><td><b>步行</b></td><td>9 分</td><td>0 元</td><td>682 m</td></tr>
+  <tr><td>苏州酒店 → 拙政园（06:45 早场）</td><td>打车 / 公交 5 路</td><td><b>24 分</b> / 36 分</td><td>18 元 / 2 元</td><td>公交需 991 m</td></tr>
+  <tr><td>苏州站 → 拙政园</td><td>地铁 2 号线 → 6 号线</td><td>27 分</td><td>2 元</td><td>910 m</td></tr>
+  <tr><td>苏州酒店 → 平江路</td><td>地铁 6 号线</td><td>38 分</td><td>2 元</td><td>2.1 km</td></tr>
+  <tr><td>苏州酒店 → 山塘街 <span class="cost">（国庆不排）</span></td><td>地铁 5 号线 → 2 号线</td><td>36 分</td><td>3 元</td><td>1.1 km</td></tr>
+  <tr><td>苏州酒店 → 观前街</td><td>地铁 / 公交</td><td>直线 2.1 km，需坐车</td><td>2–3 元</td><td>⚠️ 别以为在楼下</td></tr>
+  <tr style="background:#f0fdfa"><td><b>富饶智选酒店 → 陆家浜路地铁站</b>（8/9 号线）</td><td><b>步行</b>（最近的地铁口）</td><td><b>6 分</b></td><td>0 元</td><td><b>405 m</b></td></tr>
+  <tr style="background:#f0fdfa"><td><b>富饶智选酒店 → 外滩</b></td><td><b>打车</b> / 地铁 8→10 号线（老西门换）</td><td><b>13 分</b>（晚高峰 27 分）/ 37 分</td><td>16 元 / 3 元</td><td>3.7 km / 1.5 km</td></tr>
+  <tr style="background:#f0fdfa"><td><b>富饶智选酒店 → 南京路步行街</b></td><td><b>打车</b></td><td><b>15 分</b>（晚高峰 25 分）</td><td>16 元</td><td>3.9 km</td></tr>
+  <tr style="background:#f0fdfa"><td><b>富饶智选酒店 → 豫园 · 城隍庙</b></td><td><b>打车</b> / 步行</td><td><b>9 分</b> / 22 分</td><td>14 元 / 0 元</td><td>2.6 km</td></tr>
+  <tr style="background:#f0fdfa"><td><b>富饶智选酒店 → 陆家嘴 · 东方明珠</b></td><td>打车 / 地铁 9→2 号线（世纪大道换）</td><td>15 分 / 36 分</td><td>22 元 / 3 元</td><td>6.3 km / 1.1 km</td></tr>
+  <tr style="background:#f0fdfa"><td><b>富饶智选酒店 → 武康大楼</b></td><td><b>打车</b></td><td><b>17 分</b></td><td>21 元</td><td>6.0 km</td></tr>
+  <tr style="background:#f0fdfa"><td><b>富饶智选酒店 → 上海站</b>（10/3 抵达）</td><td>打车 / 地铁 8→1 号线（人民广场换）</td><td><b>24 分</b> / 42 分</td><td>28 元 / 3 元</td><td>8.8 km / 地铁需走 1.4 km</td></tr>
+  <tr style="background:#f0fdfa"><td><b>富饶智选酒店 → 上海松江站</b>（10/5 赶车）</td><td><b>地铁 9 号线直达 21 站</b></td><td><b>1 小时 18 分</b></td><td>7 元</td><td><b>485 m</b> ⭐</td></tr>
+  <tr><td>武康大楼 → 陆家嘴</td><td>打车（延安高架 + 隧道）</td><td><b>20 分</b></td><td>32 元</td><td>10.7 km</td></tr>
+  <tr><td>陆家嘴 → 南京东路</td><td>地铁 2 号线 1 站</td><td>约 10 分</td><td>3 元</td><td>—</td></tr>
+  <tr><td>南京路步行街 → 外滩</td><td><b>步行</b></td><td>20 分</td><td>0 元</td><td>1.34 km</td></tr>
+  <tr><td>杭州南站 → 文三路酒店</td><td>地铁 5/2/10 号线</td><td>1 小时 11 分</td><td>6 元</td><td>705 m</td></tr>
+  <tr><td>文三路酒店 → 断桥</td><td>地铁 10/2 号线</td><td>46 分</td><td>3 元</td><td>2.0 km</td></tr>
+  <tr><td>文三路酒店 → 杭州站</td><td>地铁 10/3/1 号线</td><td>35 分</td><td>3 元</td><td>718 m</td></tr>
+</table>
+
+<h2 id="s5">⑥ 预算（经济档，4 人 2 间双床 · 已含上海打车）</h2>
+<table>
+  <tr><th>项目</th><th>每人</th><th>说明</th></tr>
+  <tr><td>七晚住宿</td><td>525–700 元</td><td>算法：住 7 晚 ×（150–200 元/间/晚）÷ 2 人。四城均按此估算；<b>上海富饶智选实际房费以你的订单总价为准</b></td></tr>
+  <tr><td>餐饮 + 饮水 + 小吃</td><td>550–720 元</td><td>早餐 10–20 / 午餐 25–40 / 晚餐 35–55 元</td></tr>
+  <tr><td>三段已购城际铁路</td><td>按各人实际分摊</td><td>截图为订单显示金额，票数未展开，不除以 4</td></tr>
+  <tr><td>机场 + 四城市内交通</td><td>180–280 元</td><td>机场巴士 30 元、南京地铁 3 元/段、苏州地铁 2–3 元/段、上海地铁 3–7 元/段、杭州地铁 3–6 元/段</td></tr>
+  <tr><td><b>上海市区打车（10/3–10/5）</b></td><td><b>80–130 元</b></td><td>订富饶智选后新增的一项：约 8 趟 × 14–32 元 ÷ 4 人。含上海站→酒店、往返外滩、豫园、武康大楼、陆家嘴、回酒店</td></tr>
+  <tr><td>基础门票</td><td>95–150 元</td><td>拙政园学生票 + 网师园 + 沧浪亭 + 音乐台等</td></tr>
+  <tr><td>漂流门票 + 远郊公交</td><td>230–380 元</td><td>未锁价；停漂不花这笔</td></tr>
+  <tr><td>返校卧铺</td><td>450–500 元</td><td>按实际车次票价</td></tr>
+  <tr><td>寄存等杂费 + 机动</td><td>100–150 元</td><td></td></tr>
+  <tr style="background:#f0fdfa"><td><b>含漂流小计</b></td><td><b>2210–3010 元 + 铁路实付</b></td><td>4 人合计 8840–12040 元。比上一版多出的 80–130 元，就是上海市区打车</td></tr>
+</table>
+<div class="note">💰 不含去南京机票、购物、酒水、付费观景台。漂流未成行则每人减 230–380 元。<br>
+  住宿为区间估算，实际以四城订单总价为准。</div>
+
+<h2 id="s6">⑦ 避坑</h2>
+<div class="danger">
+  <p>❌ <b>订上海酒店要看「离外滩多远」，不是「离南京路步行街多远」。</b>南京路步行街全长 1.5 公里，靠西头的店离外滩能差出 1 公里以上，晚上走完南京路再走到外滩是两码事。</p>
+  <p>❌ <b>别以为「不在步行圈」就等于不能住。</b>富饶智选到外滩直线 3.2 公里，走路不现实 —— 但打车只要 <b>13–15 分钟 / 16 元</b>，4 人分摊 4 元/人，跟地铁一个价。真正要算的是<b>「每趟打车钱 × 每天趟数」</b>，不是直线距离。</p>
+  <p>❌ <b>别在国庆的外滩现场等出租车。</b>10/3、10/4 晚外滩—南京东路一带会管制，散场时打车 20 分钟起不来是常态。<b>回程直接走到 10 号线南京东路站坐地铁回陆家浜路</b>（37 分 / 3 元），这是这份攻略里最该记住的一条。</p>
+  <p>❌ <b>别忽略「写字楼里的酒店」。</b>富饶智选在富南大厦 4 楼，不是独栋。办入住时确认电梯高峰是否排队、房间隔音、有无外窗。<b>不满意当场要求换房，别将就两晚。</b></p>
+  <p>❌ <b>别信酒店名里的区域名，必须核门址坐标。</b>已经踩到两次：苏州「来住（观前十全街店）」实际在竹辉路，离观前街 2.1 公里；上海「如家商旅（金标）· 陆家嘴世博中心店」在浦东浦明路 1888 号，<b>离陆家嘴东方明珠 3.83 公里、离外滩 4.26 公里，而且走到最近的地铁口还要 1.2 公里</b>。<b>同一品牌同一个城市，位置可以差出 4 公里 —— 只看名字和星级一定挑错。</b></p>
+  <p>❌ <b>别忽略「到地铁口的步行距离」。</b>地铁时间是从「进了站」开始算的，但你要先走到站。<b>浦明路那家每天要多走 1.2 公里 / 18 分钟</b>，这个成本通常不在比价页面上显示。</p>
+  <p>❌ <b>别为省 100 块直接换大床房。</b>先确认大床是 1.8 米还是 1.5 米、能不能加床 —— <b>1.5 米床两人连睡 2 晚基本睡不好</b>（这次宸家就是这个坑）。三个条件同时成立才选大床：双床−大床 &gt; 100 元、大床是 1.8 米、且不能加床。</p>
+  <p>❌ <b>别以为「起价」就是能订到的价。</b>OTA 列表价是起价，且默认日期不是你们的 10/3–10/5。核价一定切到正确日期 + 2 间 + 双床看<b>结算页总价</b>。</p>
+  <p>❌ <b>苏州酒店别被名字骗。</b>「来住酒店（苏州观前十全街店）」实际在<b>竹辉路 358 号</b>，离观前街 2.1 公里。按「出门就是观前街」排路线会崩。</p>
+  <p>❌ <b>不要买「苏州园林 / 博物馆免预约」的第三方套餐。</b>拙政园只认官方渠道的实名分时购票。<b>苏博要抢预约，已挂进预备项目池，别为它花钱找黄牛 —— 抢不到就多逛 1.5 小时平江路，不亏。</b></p>
+  <p>❌ <b>不要上东方明珠付费观景层</b>当免费项目。陆家嘴滨江地面看天际线已经够了。</p>
+  <p>❌ <b>不要把杭州南站当成杭州站。</b>三个站（杭州站/杭州东/杭州南）距离差 10–20 公里。</p>
+  <p>⚠️ <b>灵隐已挂进预备项目池（不占时间块）。</b>它 2025/12/1 起飞来峰景区含灵隐寺已免票，2026/2/1 起取消现场登记改线上候补——<b>免费反而更难进，国庆基本靠抢</b>。旧攻略里「买飞来峰门票 + 香花券」的写法也别再信了。</p>
+  <p>⚠️ <b>称重糕点先问每斤/每份价格。</b>苏州糕团是重灾区，先问总价再买。</p>
+  <p>⚠️ <b>李记清真馆不在科巷。</b>在打钉巷 1 号，别导航错门店。</p>
+  <p>⚠️ <b>南京大屠杀纪念馆国庆现场基本不放散客。</b>没约上就不要去门口试运气。</p>
+  <p>💡 每班车发车前 1 小时、到站后 1 小时只用于赶路和缓冲，不排餐馆和景点 —— 这条已在动线里落实。</p>
+  <p>💡 提前把 4 人身份信息录入各自官方小程序，一人主办、另一人记日期，避免重复下单。</p>
+</div>
+<p style="font-size:13px;color:#6b7280">以上标注 ⏳ 的信息请在出行前通过官方渠道复核。地图为按真实经纬度绘制的示意图，不等于导航底图。</p>
+
+<h2 id="s7">⑧ 应急（Plan B）</h2>
+<div class="card">
+  <p style="margin-top:0;font-size:13.5px"><b>出行前把本页截图存到手机相册</b>，断网也能看。</p>
+  <h3>☔ 下雨 / 极端天气</h3>
+  <p>信号：出门前看气象预警。动作：把当天户外段换成室内（先锋书店 / 鸡鸣寺 / 上海商场 / 西湖沿线廊檐）。<b>南博、苏博要预约，不在这里面。</b>费用：不变或 +20–50 元。求助：各景区官方公众号。</p>
+  <h3>🚕 打不到车 / 外滩交通管制 ⭐新增</h3>
+  <p>信号：叫车 App 排队超过 10 分钟，或司机说进不了外滩核心区。<b>动作：立刻改地铁。</b>富饶智选对应的是 <b>10 号线南京东路站 / 8 号线陆家浜路站</b>，回酒店 34–37 分钟、3 元。<b>备选：走到南京东路西段（人民广场方向）再叫车，避开管制圈。</b>额外花费：0 元（地铁）或 +10–20 元（绕行打车）。求助：叫车 App 客服、地铁工作人员。</p>
+  <h3>🚉 误车 / 晚点</h3>
+  <p>信号：到站晚于发车前 20 分钟。动作：立刻在 12306 改签当日后续车次（T27 / K371 / K575 都是普速，同日多有后续）。<b>10/5 若赶不上 K575，最快的补救是回 9 号线往市区方向再换高铁</b>。费用：改签差价为 0 或按票价差额。求助：12306 App、车站售票窗口。</p>
+  <h3>🎫 场馆临时闭馆 / 约不到</h3>
+  <p>信号：官方公众号发闭馆通知，或预约页显示无票。动作：明孝陵 / 美龄宫→颐和路 + 先锋书店；拙政园→平江路慢走并提前去车站。<b>中山陵、南博、苏博、上博、灵隐这些要预约的本来就没排进时间块（都在预备池里挂着），所以这条风险已经不存在了。</b>费用：省下门票。求助：各馆官方公众号。</p>
+  <h3>🍜 网红店排队爆满</h3>
+  <p>信号：排队超过 30 分钟。动作：李记清真馆→同街其他小馆；大壶春→南京路周边任意生煎店；朱鸿兴→观前街其他面馆。<b>豫园城隍庙里的小吃摊普遍贵且一般，想吃小笼去南翔馒头店以外的街区店。</b>费用：持平。求助：大众点评就近筛选。</p>
+  <h3>🏥 身体不适 / 中暑 / 受伤</h3>
+  <p>信号：头晕、腹泻、扭伤。动作：就近医院或药店（地图搜「医院」），压缩当天行程保留下一天。<b>富饶智选附近：第九人民医院黄浦分院门诊在普育东路 58 号，离酒店约 600 米 / 步行 8 分钟</b>（腾讯地图周边实查）—— 这点挺方便。费用：视情况。求助：120；异地就医用医保电子凭证。</p>
+  <h3>🏨 到店无房 / 预订失败</h3>
+  <p>信号：前台查不到订单。动作：出示订单截图 → 联系平台客服 → 要求安排同商圈同档次替代住宿并留证。<b>备选片区：黄埔南部的陆家浜路 / 西藏南路一带同档次酒店多，当场换不难。</b>费用：差价由平台承担（需争议）。求助：预订平台客服、12315。</p>
+  <h3>📱 手机没电 / 断网</h3>
+  <p>信号：电量低于 20%。动作：出发前把本页截图离线保存；充电宝全程携带；约定固定集合点（每城地铁站出口，上海＝<b>陆家浜路站 6 口</b>）。费用：租借充电宝 3–6 元/次。求助：便利店租借充电宝。</p>
+</div>
+
+<h2 id="s8">⑨ 小红书热度榜（景点受欢迎程度 · 实抓数据）</h2>
+<div class="card">
+  <strong>这张榜是怎么来的</strong>
+  <p>在你<b>自己登录的小红书</b>里，用 <b>55 组关键词</b>（每城 12–14 组，覆盖「旅游攻略 / citywalk / 具体景点 / 美食 / 避坑」五类），抓下搜索结果页共 <b>1,217 篇笔记</b>（南京 171 / 苏州 381 / 上海 329 / 杭州 336）的<b>点赞数原始值</b>（不是页面显示的「1.2万」这种约数，是后台整数）。</p>
+  <p>然后把笔记标题按景点名匹配，<b>同一景点的多篇笔记点赞相加 = 那个景点的热度</b>。同时给出「推荐篇数」和「单篇最高」，避免被一两条爆款带偏。</p>
+  <p>⚠️ <b>老实说清楚局限</b>：样本 1,217 篇、只按标题匹配景点名（未逐篇读正文），所以这是<b>趋势参考</b>，不是精确排名。而且标题里不点名景点的笔记（比如「南京最美的 14 个地方」）匹配不上任何景点——这类笔记点赞很高但进了"未归类"，所以<b>绝对数值会被低估，但相对排序是可信的</b>。</p>
+  <p class="note" style="margin-bottom:0">🟥 红条长度 = 该景点热度占本城第一名的比例。「劝退篇」已从火力值中剔除（比如「比起夫子庙，我更爱…」这种），单独列出供你参考。</p>
+</div>
+<div class="card">
+  <h3>南京 · 热度榜 <span class="cost">样本 171 篇笔记</span></h3>
+  <table>
+    <tr><th style="width:22%%">景点</th><th>热度</th><th style="width:12%%">推荐篇数</th><th style="width:12%%">单篇最高</th><th style="width:10%%">劝退篇</th></tr>
+    <tr><td><b>梧桐大道/颐和路</b></td><td><span style="font-variant-numeric:tabular-nums">5,483 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:100%;margin-top:3px"></span></td><td>24 篇</td><td>1,820</td><td><span style="color:#b91c1c">1</span></td></tr>
+    <tr><td><b>玄武湖</b></td><td><span style="font-variant-numeric:tabular-nums">5,448 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:99%;margin-top:3px"></span></td><td>5 篇</td><td>4,131</td><td>—</td></tr>
+    <tr><td><b>紫金山</b></td><td><span style="font-variant-numeric:tabular-nums">4,775 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:87%;margin-top:3px"></span></td><td>1 篇</td><td>4,775</td><td>—</td></tr>
+    <tr><td><b>夫子庙</b></td><td><span style="font-variant-numeric:tabular-nums">2,802 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:51%;margin-top:3px"></span></td><td>3 篇</td><td>1,893</td><td>—</td></tr>
+    <tr><td><b>鸡鸣寺</b></td><td><span style="font-variant-numeric:tabular-nums">2,086 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:38%;margin-top:3px"></span></td><td>1 篇</td><td>2,086</td><td>—</td></tr>
+    <tr><td><b>城墙</b></td><td><span style="font-variant-numeric:tabular-nums">2,071 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:38%;margin-top:3px"></span></td><td>12 篇</td><td>1,450</td><td>—</td></tr>
+    <tr><td><b>音乐台</b></td><td><span style="font-variant-numeric:tabular-nums">1,904 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:35%;margin-top:3px"></span></td><td>1 篇</td><td>1,904</td><td>—</td></tr>
+    <tr><td><b>南京博物院</b></td><td><span style="font-variant-numeric:tabular-nums">1,016 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:19%;margin-top:3px"></span></td><td>9 篇</td><td>840</td><td>—</td></tr>
+  </table>
+  <div class="note">📌 紫金山（含明孝陵/中山陵那片山林）是断层第一，<b>「南京最好玩的地方都免费」是这城最主流的叙事</b>。注意夫子庙：有 1 篇 6949 赞的爆款标题是「<b>比起夫子庙，我更爱南京这 10 个地方</b>」——它是被当成「游客陷阱」在讨论的，所以我把它从火力值里剔出来了。</div>
+</div>
+<div class="card">
+  <h3>苏州 · 热度榜 <span class="cost">样本 381 篇笔记</span></h3>
+  <table>
+    <tr><th style="width:22%%">景点</th><th>热度</th><th style="width:12%%">推荐篇数</th><th style="width:12%%">单篇最高</th><th style="width:10%%">劝退篇</th></tr>
+    <tr><td><b>平江路</b></td><td><span style="font-variant-numeric:tabular-nums">14,127 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:100%;margin-top:3px"></span></td><td>26 篇</td><td>6,186</td><td><span style="color:#b91c1c">2</span></td></tr>
+    <tr><td><b>十全街</b></td><td><span style="font-variant-numeric:tabular-nums">10,376 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:73%;margin-top:3px"></span></td><td>24 篇</td><td>2,793</td><td><span style="color:#b91c1c">1</span></td></tr>
+    <tr><td><b>山塘街</b></td><td><span style="font-variant-numeric:tabular-nums">9,795 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:69%;margin-top:3px"></span></td><td>24 篇</td><td>5,554</td><td><span style="color:#b91c1c">1</span></td></tr>
+    <tr><td><b>网师园</b></td><td><span style="font-variant-numeric:tabular-nums">7,565 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:54%;margin-top:3px"></span></td><td>20 篇</td><td>5,355</td><td>—</td></tr>
+    <tr><td><b>金鸡湖</b></td><td><span style="font-variant-numeric:tabular-nums">4,443 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:31%;margin-top:3px"></span></td><td>1 篇</td><td>4,443</td><td>—</td></tr>
+    <tr><td><b>观前街</b></td><td><span style="font-variant-numeric:tabular-nums">2,463 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:17%;margin-top:3px"></span></td><td>5 篇</td><td>1,652</td><td>—</td></tr>
+    <tr><td><b>拙政园</b></td><td><span style="font-variant-numeric:tabular-nums">2,294 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:16%;margin-top:3px"></span></td><td>22 篇</td><td>412</td><td><span style="color:#b91c1c">1</span></td></tr>
+    <tr><td><b>留园</b></td><td><span style="font-variant-numeric:tabular-nums">1,287 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:9%;margin-top:3px"></span></td><td>4 篇</td><td>1,213</td><td>—</td></tr>
+  </table>
+  <div class="note">📌 <b>平江路 > 十全街 > 山塘街</b>，前四名里三个是免费街区，古城区这一圈押对了。真正反直觉的是<b>网师园（20 篇推荐、7565 赞）热度高于拙政园的 4 倍</b>——小红书在苏州传的是「小而精的园子 + 免费夜游」，不是「四大名园打卡」。<b>十全街 24 篇</b>也说明你酒店门口那条街本身就是内容。</div>
+</div>
+<div class="card">
+  <h3>上海 · 热度榜 <span class="cost">样本 329 篇笔记</span></h3>
+  <table>
+    <tr><th style="width:22%%">景点</th><th>热度</th><th style="width:12%%">推荐篇数</th><th style="width:12%%">单篇最高</th><th style="width:10%%">劝退篇</th></tr>
+    <tr><td><b>外滩</b></td><td><span style="font-variant-numeric:tabular-nums">38,609 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:100%;margin-top:3px"></span></td><td>64 篇</td><td>8,791</td><td>—</td></tr>
+    <tr><td><b>南京路步行街</b></td><td><span style="font-variant-numeric:tabular-nums">17,748 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:46%;margin-top:3px"></span></td><td>16 篇</td><td>8,791</td><td>—</td></tr>
+    <tr><td><b>北外滩</b></td><td><span style="font-variant-numeric:tabular-nums">16,767 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:43%;margin-top:3px"></span></td><td>33 篇</td><td>4,993</td><td>—</td></tr>
+    <tr><td><b>豫园/城隍庙</b></td><td><span style="font-variant-numeric:tabular-nums">14,704 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:38%;margin-top:3px"></span></td><td>14 篇</td><td>3,911</td><td><span style="color:#b91c1c">3</span></td></tr>
+    <tr><td><b>武康大楼/武康路</b></td><td><span style="font-variant-numeric:tabular-nums">11,511 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:30%;margin-top:3px"></span></td><td>14 篇</td><td>5,307</td><td><span style="color:#b91c1c">2</span></td></tr>
+    <tr><td><b>安福路</b></td><td><span style="font-variant-numeric:tabular-nums">8,260 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:21%;margin-top:3px"></span></td><td>21 篇</td><td>1,870</td><td><span style="color:#b91c1c">1</span></td></tr>
+    <tr><td><b>陆家嘴/东方明珠</b></td><td><span style="font-variant-numeric:tabular-nums">3,800 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:10%;margin-top:3px"></span></td><td>28 篇</td><td>1,692</td><td>—</td></tr>
+    <tr><td><b>五角场/大学路</b></td><td><span style="font-variant-numeric:tabular-nums">2,119 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:5%;margin-top:3px"></span></td><td>1 篇</td><td>2,119</td><td>—</td></tr>
+  </table>
+  <div class="note">📌 外滩仍是第一（64 篇），但<b>北外滩用一半的篇数拿到 43% 的火力值</b>——它的爆款标题就是「<b>3km 江景不用挤，夜景随便拍</b>」，这是国庆最该记住的替代方案。武康路有 2 篇劝退（「比起武康路，我更喜欢这条路线」5411 赞），<b>它是被高估的网红点</b>；豫园 3 篇劝退，主要骂商业化。</div>
+</div>
+<div class="card">
+  <h3>杭州 · 热度榜 <span class="cost">样本 336 篇笔记</span></h3>
+  <table>
+    <tr><th style="width:22%%">景点</th><th>热度</th><th style="width:12%%">推荐篇数</th><th style="width:12%%">单篇最高</th><th style="width:10%%">劝退篇</th></tr>
+    <tr><td><b>西湖</b></td><td><span style="font-variant-numeric:tabular-nums">129,821 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:100%;margin-top:3px"></span></td><td>132 篇</td><td>8,363</td><td><span style="color:#b91c1c">5</span></td></tr>
+    <tr><td><b>水上公交</b></td><td><span style="font-variant-numeric:tabular-nums">4,738 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:4%;margin-top:3px"></span></td><td>1 篇</td><td>4,738</td><td>—</td></tr>
+    <tr><td><b>河坊街</b></td><td><span style="font-variant-numeric:tabular-nums">2,094 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:3%;margin-top:3px"></span></td><td>6 篇</td><td>1,243</td><td>—</td></tr>
+    <tr><td><b>灵隐寺</b></td><td><span style="font-variant-numeric:tabular-nums">1,076 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:3%;margin-top:3px"></span></td><td>4 篇</td><td>839</td><td><span style="color:#b91c1c">2</span></td></tr>
+    <tr><td><b>南宋御街</b></td><td><span style="font-variant-numeric:tabular-nums">887 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:3%;margin-top:3px"></span></td><td>6 篇</td><td>463</td><td>—</td></tr>
+    <tr><td><b>白堤</b></td><td><span style="font-variant-numeric:tabular-nums">538 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:3%;margin-top:3px"></span></td><td>3 篇</td><td>530</td><td>—</td></tr>
+    <tr><td><b>断桥</b></td><td><span style="font-variant-numeric:tabular-nums">534 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:3%;margin-top:3px"></span></td><td>2 篇</td><td>530</td><td>—</td></tr>
+    <tr><td><b>西溪湿地</b></td><td><span style="font-variant-numeric:tabular-nums">316 赞</span><span style="display:block;height:7px;border-radius:4px;background:#ef4444;opacity:.8;width:3%;margin-top:3px"></span></td><td>1 篇</td><td>316</td><td>—</td></tr>
+  </table>
+  <div class="note">📌 西湖以 132 篇笔记、12.98 万赞<b>断崖式碾压全榜</b>，是四城最集中的单点。第二名不是景点而是「<b>3 元水上公交</b>」（4738 赞）——而「<b>西湖半日游，低精力版</b>」8363 赞、「不费体力版」4741 赞同时上榜，说明<b>小红书现在教的是「怎么省力地玩西湖」</b>，这正好对应你 10/7 只有半天的现实。</div>
+</div>
+<div class="card">
+  <h3>四城最高赞笔记（就是这些内容在带节奏）</h3>
+  <table>
+    <tr><th style="width:9%">城市</th><th style="width:10%">点赞</th><th>标题</th></tr>
+    <tr><td>杭州</td><td><b>8,363</b></td><td>西湖半日游，低精力+带父母少走路路线</td></tr>
+    <tr><td>杭州</td><td><b>8,022</b></td><td>以为西湖够美了｜直到我去了现实版抹茶森林</td></tr>
+    <tr><td>杭州</td><td><b>7,031</b></td><td>大年初二5小时游玩西湖</td></tr>
+    <tr><td>杭州</td><td><b>6,020</b></td><td>妈妈问我总往杭州跑</td></tr>
+    <tr><td>杭州</td><td><b>5,812</b></td><td>低精力走马观花半日游西湖</td></tr>
+    <tr><td>上海</td><td><b>9,136</b></td><td>上海最好的地方都是免费的。。。。。（Live合集）</td></tr>
+    <tr><td>上海</td><td><b>8,889</b></td><td>谁再说杭州是美食荒漠！我第一个不同意！！</td></tr>
+    <tr><td>上海</td><td><b>8,791</b></td><td>上海2日游🔥外滩+南京路👉超精华路线！</td></tr>
+    <tr><td>上海</td><td><b>8,569</b></td><td>上海夏天必逛的5条林荫路线！每一条都绝美</td></tr>
+    <tr><td>上海</td><td><b>8,514</b></td><td>上海隐藏吃谷圣地超详细citywalk打卡攻略</td></tr>
+    <tr><td>苏州</td><td><b>8,855</b></td><td>游园|苏州最值得去的九大园林</td></tr>
+    <tr><td>苏州</td><td><b>7,635</b></td><td>苏州真是海滨城市！最爱的citywalk路线</td></tr>
+    <tr><td>苏州</td><td><b>7,132</b></td><td>苏州本地人带你吃遍苏州各大景点12家好店</td></tr>
+    <tr><td>苏州</td><td><b>6,840</b></td><td>夜游｜苏州最好的地方都是免费的</td></tr>
+    <tr><td>苏州</td><td><b>6,186</b></td><td>苏州平江路攻略🍂看这一篇就够啦！超详细</td></tr>
+    <tr><td>南京</td><td><b>7,516</b></td><td>南京景点从夯到拉（大胆锐评版）</td></tr>
+    <tr><td>南京</td><td><b>6,623</b></td><td>新街口有什么必吃的吗！不吃就后悔的那种</td></tr>
+    <tr><td>南京</td><td><b>5,466</b></td><td>✍🏻关于本i人在南京citywalk喜欢的一些地方</td></tr>
+    <tr><td>南京</td><td><b>4,795</b></td><td>南京遇难同胞纪念馆预约成功技巧</td></tr>
+    <tr><td>南京</td><td><b>4,775</b></td><td>紫金山｜雨洗秋山净</td></tr>
+  </table>
+  <div class="note">📝 看这一列比看景点榜更有用：<b>它们代表"大家现在真想看什么"</b>。你会发现「免费」「citywalk」「不用挤」「低精力」是四个最高频的关键词——这正是你这份攻略可以顺着优化的方向。</div>
+</div>
+<h2 id="s9">⑩ 小红书干货（从爆款笔记正文里扒出来的，可直接执行）</h2>
+
+<div class="card">
+  <strong>先看一个绕不开的结论</strong>
+  <p>四城点赞最高的笔记，标题几乎是一个模子：<b>「上海最好的地方都是免费的」（9136 赞）、「夜游｜苏州最好的地方都是免费的」（6840 赞）、「南京最好的地方都是免费的」（3633 赞）</b>。
+  这不是巧合——<b>「免费 + 走路 + 好看」是这四座城市在小红书上最通行的内容公式</b>，也是你这份攻略最值得对齐的方向：花钱的园子和付费观景台，热度普遍打不过免费的街巷和江边。</p>
+  <p>另外三个高频词是：<b>「citywalk」「不用挤」「低精力」</b>。你这次是 4 人 2 间双床、国庆出行、上海住宿已经为了省钱挪到了黄浦南部——<b>这几条正好和你的处境吻合</b>。</p>
+</div>
+
+<div class="card">
+  <h3>可以直接抄进日程的 7 件事 <span class="cost">顺手核过一遍，都是免费或低价的</span></h3>
+  <table>
+    <tr><th style="width:16%">城市</th><th style="width:26%">具体做什么</th><th>怎么落地（笔记里写的原文信息）</th><th style="width:10%">来源赞数</th></tr>
+    <tr>
+      <td><b>杭州</b></td>
+      <td><b>3 元水上巴士</b><br>（笔记标题就是"一定要坐"）</td>
+      <td>坐 <b>7 号水上巴士</b>，是全线最美的一条，<b>坝子桥 → 梅花碑</b>，全程 <b>4 公里约 40 分钟</b>，穿很多桥洞。<br>🚇 坝子桥上船：地铁到<b>宝善桥</b>；梅花碑上船：地铁到<b>江城路</b>走几步就到。<b>只花 3 元，是西湖之外性价比最高的一项</b></td>
+      <td>4,738</td>
+    </tr>
+    <tr>
+      <td><b>上海</b></td>
+      <td><b>北外滩滨江步道</b><br>（"3km 江景不用挤"）</td>
+      <td>全程约 <b>3 公里纯滨江步道，不绕路</b>。<b>17:30–18:00 出发</b>，边走边拍 1.5–2 小时走完（纯散步 1 小时）。<br>路线：<b>12 号线天潼路 3 号口 → 邮政博物馆 → 乍浦路桥 → 世界会客厅 → 滨江观景平台 → Manner Coffee → 小巨蛋 → 国客中心</b></td>
+      <td>3,631</td>
+    </tr>
+    <tr>
+      <td><b>上海</b></td>
+      <td><b>浦东美术馆观景台</b><br>（免费看日落 + 外滩亮灯）</td>
+      <td><b>陆家嘴地铁站出来直达</b>。<b>18:30 之后</b>拍日落与外滩亮灯，"仪式感拉满"。<br>💡 和你 10/4「陆家嘴 → 南京路 → 外滩」的动线能对齐：把陆家嘴那段压到 18:00 后，先上观景台看亮灯，再坐地铁 2 号线一站去南京东路</td>
+      <td>9,136</td>
+    </tr>
+    <tr>
+      <td><b>上海</b></td>
+      <td><b>东金线轮渡</b><br>（北外滩 ⇄ 浦东，10 分钟）</td>
+      <td>北外滩前往浦东美术馆可坐东金线轮渡，<b>刷交通卡 / 随申码直接登船，航程约 10 分钟</b>，傍晚能看江景日落。<b>记得留意末班时间</b>。<br>比你原计划的"打车过江"便宜得多</td>
+      <td>9,136</td>
+    </tr>
+    <tr>
+      <td><b>南京</b></td>
+      <td><b>城墙怎么登</b><br>（"帮你省 2 小时"）</td>
+      <td>南京城墙<b>开放段约 22 公里，分成好多段且彼此不连通，售票各论各的</b>——乱走极容易白跑。<br>✅ <b>时间有限优先「解放门」或「中华门」登城</b>。解放门就在<b>鸡鸣寺一出来</b>，登上去能同时看到鸡鸣寺 + 玄武湖 + 紫金山，<b>一段城墙打卡三大地标</b>。<br>参考票价：北线 6km / 30 元，南线 6km / 50 元，东线 5 元，西线部分<b>免费</b>。夕阳封神</td>
+      <td>1,450</td>
+    </tr>
+    <tr>
+      <td><b>苏州</b></td>
+      <td><b>夜游路线</b><br>（"苏州最好的地方都是免费的"）</td>
+      <td><b>平江路 · 碑亭 → 遇见平江 → 手摇船码头 → 齐云楼 → 平江路北段 → 拙政园 → 苏州博物馆 → 山塘街 → 阊门</b>。<br>⏰ <b>推荐拍摄时间 18:30–19:30</b>。<b>齐云楼一楼临河座位最出片，有昆曲表演</b>（就在手摇船码头旁），三虾面有名。<br>⚠️ <b>苏博 &amp; 拙政园夜游需要提前预约</b></td>
+      <td>6,840</td>
+    </tr>
+    <tr>
+      <td><b>苏州</b></td>
+      <td><b>平江路听评弹 10 元</b></td>
+      <td>笔记原话：「在平江路听了场只要 10 元的苏州评弹」。<b>平江路沿街有评弹小场，10 元就能听一场</b>——比买票进园子的体验密度高得多，也完全对上你"只玩古城区一圈"的设定</td>
+      <td>1,174</td>
+    </tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>⚠️ 小红书上被集体「劝退」的 4 个点</h3>
+  <p>这部分和你原攻略的避坑清单能对上，但数据更狠——<b>都是高赞爆款在劝退，不是个别吐槽</b>：</p>
+  <table>
+    <tr><th style="width:18%">地点</th><th>小红书上的原话 / 数据</th></tr>
+    <tr><td><b>南京 · 夫子庙</b></td><td>该城<b>最高赞笔记（6,949 赞）标题就是「比起夫子庙，我更爱南京这 10 个地方（免费）」</b>——它是被当"游客陷阱"在讨论的。热度榜里夫子庙只有 875 赞（4 篇推荐 + <b>1 篇劝退</b>），而紫金山一片 4,775 赞。<b>建议：夫子庙只当秦淮河的过路点，别在里面吃正餐</b>（你的攻略原本就是这么定的，现在有数据背书了）</td></tr>
+    <tr><td><b>上海 · 武康路</b></td><td>有 <b>2 篇是劝退</b>，其中「<b>比起武康路，我更喜欢上海这条 Citywalk 路线</b>」<b>5,411 赞</b>；还有一篇直接叫「<b>武康路请别去</b>」。<b>建议：武康大楼拍完就走，别在安福路一带压太久</b>——你 10/4 上午排了 3 小时，可以砍到 2 小时</td></tr>
+    <tr><td><b>上海 · 外滩（人挤人）</b></td><td>「<b>上海｜避开外滩人挤人 10r 拍到人生照片</b>」、多篇笔记都在推<b>北外滩替代</b>。国庆的外滩—南京东路会管制，<b>北外滩是同一条江、同一片陆家嘴天际线，但人少得多</b></td></tr>
+    <tr><td><b>苏州 · 拙政园 / 山塘街</b></td><td>数据刷新后（苏州样本从 49 篇扩到 <b>381 篇</b>）：<b>拙政园 22 篇提到但单篇最高只有 412 赞</b>——名气大、内容火不起来，原笔记原话是「人非常多、商拍多」。<b>山塘街更明确：3534 赞的国庆专篇第一条就是「不要拜访七里山塘」。</b><b>建议：拙政园保留 06:45 早场（清晨是它唯一体面的时候），山塘街国庆直接不排</b></td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>给你这趟（9/30–10/7 · 国庆 · 4 人）的三条针对性提醒</h3>
+  <div class="ok">
+    <b>① 国庆去外滩，把"看夜景"这件事拆成两晚。</b>10/3 晚落地后去豫园（离你酒店 2.6km），10/4 晚再去外滩。<b>如果 10/4 外滩人挤到走不动，就地转北外滩</b>——同一片江景，从南京东路打车过去约 10 分钟，人少一大截。小红书上的爆款已经把这个替代方案验证过很多次了。
+  </div>
+  <div class="ok">
+    <b>② 杭州那两天，把「3 元水上巴士」插进去。</b>你杭州待得最久、行程最松，这条 <b>40 分钟 / 3 元 / 4 公里</b>的水上路，是全榜性价比最高的一项，而且从宝善桥或江城路地铁直达，完全不占别的安排。
+  </div>
+  <div class="ok">
+    <b>③ 苏博、拙政园夜游要提前预约。</b>小红书笔记明确写了这一点。国庆名额紧张，<b>现在就可以去官方渠道看预约放票时间</b>，别等到苏州当天才想起来 —— 它们都挂在 <a href="#pool">预备项目池</a> 里，<b>约不到不影响行程</b>。
+  </div>
+  <div class="note" style="margin-bottom:0">
+    📝 <b>数据边界说明</b>：本节的原文信息来自 5 篇爆款正文（点赞 1,174–9,136），路线、票价、时长都是<b>笔记作者写的原话</b>，我没有逐项实地核验。其中<b>票价和地铁出口</b>这类信息建议出发前用地图再确认一次；<b>路线顺序和时段</b>是可靠的。
+  </div>
+</div>
+
+
+<h2 id="s10">⑪ 南京深度攻略（小红书 171 篇实抓 + 地图实测）</h2>
+
+<p>数据来源：小红书南京相关笔记实抓 <b>171 篇</b>（12 组关键词：梧桐大道 / 颐和路 / 南博预约 / 中山陵 / 明孝陵 / 夫子庙老门东 / 城墙台城 / 鸡鸣寺 / 玄武湖 / 先锋书店 / 美食 / 避坑），加上腾讯地图实测的通勤与步行距离。</p>
+
+<div class="warn">
+  ⚠️ <b>先认清一个现实：南京你只有 1 个整天。</b>9/30 晚落地直接睡，10/2 一早的车去苏州 —— 能用的就是 <b>10/1 这一个白天 + 一个晚上</b>。所以下面所有建议都按「一天」排，不是三天。<b>别按网上那种「南京三日游」抄，抄了一定走不完。</b>
+</div>
+
+<h3>① 小红书锐评榜：南京景点从夯到拉 <span class="cost">7516 赞 · 本地博主分级</span></h3>
+<p>这是南京站点赞最高的一篇（7516），作者自称在南京待了很多年。他把景点分成五档，我把原话和<b>我们这次的判断</b>并排列出来：</p>
+<table>
+  <tr><th>等级</th><th>景点</th><th>他的原话要点</th><th>我们的判断（4 人 · 国庆 · 只有 1 天）</th></tr>
+  <tr><td rowspan="4">🔴 <b>夯</b><br>（闭眼冲）</td><td><b>南京博物院</b></td><td>几十万件馆藏，广陵王印、金兽等国宝，历史爱好者能泡一下午</td><td><b>强烈推荐，但要预约</b>。免费、室内、下雨也不怕。国庆约不到就立刻改别的</td></tr>
+  <tr><td><b>大报恩寺</b></td><td>南京最值得去的城市地标，「晚上点灯仪式是真的震撼」</td><td><b>值得考虑的晚间项</b>。离老门东很近，可以顶替夫子庙的商业化夜游。注意门票另收</td></tr>
+  <tr><td>遇难同胞纪念馆</td><td>来南京一定要去，肃穆庄重，门口可领鲜花</td><td>需预约，本次未约上，<b>不排</b>。国庆现场通常不放散客</td></tr>
+  <tr><td>红山动物园</td><td>无动物表演，逛着超治愈</td><td><b>一天排不下</b>（在城北，单玩要 4 小时）。留给下次</td></tr>
+  <tr><td rowspan="4">🟠 <b>人上人</b></td><td><b>中山陵</b></td><td>免费登顶俯瞰全城，<b>但台阶巨多（392 级）</b></td><td><b>能约到就去，约不到别硬挤</b>。国庆当天人最多，392 级台阶对体力是考验</td></tr>
+  <tr><td><b>明孝陵</b></td><td>秋景绝美，帝王神道石刻厚重</td><td><b>石象路是南京秋天最出片的一段</b>，10 月初叶子还没全黄，但神道本身够看</td></tr>
+  <tr><td><b>玄武湖</b></td><td>本地人后花园，<b>短途旅行不用专程来</b></td><td>同意。它适合<b>傍晚顺路看日落</b>，不值得单独占半天</td></tr>
+  <tr><td>总统府</td><td>近代史底蕴足，<b>不听讲解容易白逛</b></td><td>一天排不下，跳过</td></tr>
+  <tr><td rowspan="5">🟡 <b>顶级</b></td><td><b>梧桐大道</b></td><td><b>不用死磕一处；美龄宫周边梧桐人更少更好拍</b></td><td>⭐ <b>这是你点名要的，也是本篇最有用的一条</b>。见下面「梧桐大道到底去哪段」</td></tr>
+  <tr><td>美龄宫</td><td>周边梧桐人少、更好拍</td><td><b>推荐</b>。30 元，建筑本身就好看，还能顺带把梧桐拍了</td></tr>
+  <tr><td>先锋书店</td><td>褪去打卡热度回归本身，<b>只拍照没必要</b></td><td>如果你不为看书，就别专程跑一趟五台山店</td></tr>
+  <tr><td><b>老门东</b></td><td>挨着夫子庙，小吃平价好逛</td><td><b>推荐，比夫子庙好逛</b>。小吃 4 人分吃最合适</td></tr>
+  <tr><td>夫子庙</td><td>地标，首次来可浅逛，<b>商业化偏重</b></td><td>晚间看一眼夜景即可，<b>别在里面吃正餐</b></td></tr>
+  <tr><td rowspan="4">⚪ <b>NPC</b></td><td>南京城墙</td><td>只适合远眺玄武湖</td><td>见下面「城墙怎么上」——<b>选对段很值，选错段白花钱</b></td></tr>
+  <tr><td>鸡鸣寺</td><td>逛玄武湖顺路打卡足够</td><td>同意，<b>顺路</b>，不顺路不用去</td></tr>
+  <tr><td>中华门</td><td>亮点少</td><td>跳过</td></tr>
+  <tr><td><b>颐和路</b></td><td>拍照出片，大学生私藏拍照街</td><td><b>推荐</b>，免费、人相对少。热度榜里它排第一不是没道理</td></tr>
+  <tr><td>⚫ <b>拉完了</b></td><td>德基网红厕所、鱼嘴湿地、悦动新门西大字墙、长江大桥</td><td>网红炒起来的，要么偏远要么可玩性极低</td><td><b>一个都别去</b></td></tr>
+</table>
+
+<h3>② 梧桐大道到底去哪段 <span class="cost">热度榜第 1 · 24 篇推荐 / 5483 赞</span></h3>
+<div class="card">
+  <strong>南京的「梧桐大道」不是只有一条</strong>
+  <table>
+    <tr><th>路段</th><th>在哪</th><th>特点</th><th>适合你吗</th></tr>
+    <tr><td><b>陵园路</b>（最出名）</td><td>钟山风景区内，去中山陵的主路</td><td>网上 90% 的梧桐照片出自这里。<b>国庆人最多</b></td><td>如果本来就进钟山景区，顺路走。别为它单独跑</td></tr>
+    <tr><td><b>美龄宫周边</b> ⭐</td><td>中山陵 9 号，钟山景区内</td><td>小红书锐评原话：<b>「美龄宫周边梧桐人更少更好拍」</b>。宫堡本身是民国建筑精品</td><td><b>最优解</b>：拍梧桐 + 逛美龄宫一次搞定，门票才 30 元</td></tr>
+    <tr><td><b>颐和路公馆区</b></td><td>鼓楼区，离新街口约 3 公里</td><td>法国梧桐 + 民国公馆群，<b>免费</b>。热度榜第一名</td><td><b>如果只拍一次梧桐，选这里</b>。不进钟山也能安排，省下大半天</td></tr>
+  </table>
+  <div class="note">📝 <b>一句结论</b>：想拍梧桐不一定要进钟山。<b>「颐和路（免费）」或「美龄宫（30 元）」任选其一就够</b>，陵园路是「反正要进钟山」时的顺路项。<br>
+  🗺️ 实测：颐和路 ↔ 先锋书店五台山店 直线约 1.5 公里，可以连着逛；颐和路 → 老门东 直线 6.3 公里，得坐车。</div>
+</div>
+
+<h3>③ 重点景点速查（热度 + 票价 + 玩法）</h3>
+<table>
+  <tr><th>景点</th><th>小红书热度</th><th>门票 / 预约</th><th>建议时长</th><th>怎么玩（具体到能执行）</th></tr>
+  <tr><td><b>颐和路公馆区</b></td><td>5483 赞 / 24 篇<br><span class="cost">热度榜第 1</span></td><td><b>免费</b></td><td>1–1.5 小时</td><td>慢走拍照，别进院（多为私人/办公）。<b>傍晚 17:00 后光线最好</b>，小红书上「蓝调时刻的颐和路」是单独一个爆款</td></tr>
+  <tr><td><b>玄武湖</b></td><td>5448 赞 / 5 篇<br><span class="cost">单篇最高 4131</span></td><td><b>免费</b></td><td>1.5 小时<br>（环湖走完要 3 小时）</td><td><b>只推荐傍晚看日落</b>。现成路线见下节。地铁 4 号线鸡鸣寺站 5 号口出就是解放门</td></tr>
+  <tr><td><b>夫子庙 · 秦淮河</b></td><td>2802+453 赞 / 5 篇</td><td>街区免费<br>游船、贡院另收费</td><td>1 小时</td><td><b>只逛夜景，不吃正餐</b>。商业化重是全网共识。亮灯后比白天好看</td></tr>
+  <tr><td><b>鸡鸣寺</b></td><td>2086 赞</td><td>约 10 元（含香）</td><td>40 分钟</td><td><b>顺路即可</b>。出门就是解放门城墙，再走就是玄武湖 —— 三点连成一线，这是南京最高效的一段</td></tr>
+  <tr><td><b>明城墙</b></td><td>2071 赞 / 12 篇</td><td>分段落，见下节</td><td>40 分钟</td><td><b>只上一段就够</b>。别以为买张票能走一圈</td></tr>
+  <tr><td><b>音乐台</b></td><td>1904 赞</td><td>5–10 元</td><td>40 分钟</td><td>就在中山陵旁，<b>喂鸽子</b>，出片率高、性价比高。进钟山的话顺路加</td></tr>
+  <tr style="background:#fef2f2"><td><b>南京博物院</b> <span class="cost">🚫 需预约·已移出计划</span></td><td>1016 赞 / 9 篇</td><td><b>免费，必须预约</b><br>官方公众号 / 小程序</td><td>—</td><td>🚫 <b>按你的要求移出计划</b>：免费但要抢名额，国庆约不到。<b>替代方案：颐和路 + 先锋书店</b> —— 同样免费、同样室内、同样下雨不怕，还不用抢。<br>📌 如果你后面改主意想赌一把：开约就抢，放票时间看官方公众号</td></tr>
+  <tr style="background:#fef2f2"><td><b>中山陵</b> <span class="cost">🚫 需预约·已移出计划</span></td><td>0 篇推荐 / 1 篇劝退<br><span class="cost">本次样本里唯一负分</span></td><td><b>免费，必须线上实名预约</b><br>「钟山风景区」公众号<br>周一闭馆（节假日除外）<br>8:30–17:00，16:30 停止入园</td><td>2–2.5 小时</td><td>🚫 <b>按你的要求移出计划</b>：免费但必须实名预约，且实测通勤很亏（地铁 58 分 + 走 2.7 公里）。<b>替代方案：明孝陵 · 石象路 / 美龄宫</b> —— 同一片钟山景区，买票就进，梧桐一样看</td></tr>
+  <tr><td><b>明孝陵 · 石象路</b></td><td>—</td><td>约 70 元（学生半价）<br>四景联票约 100 元</td><td>1.5 小时</td><td>神道第一段 615 米，六种石兽。<b>秋景最出名</b>，10 月初还没到最佳期，但石刻本身值得看</td></tr>
+  <tr><td><b>美龄宫</b></td><td>—</td><td>约 30 元</td><td>50 分钟</td><td>民国官邸建筑 + 周边梧桐。<b>人比陵园路少</b></td></tr>
+  <tr><td><b>大报恩寺遗址</b></td><td>—</td><td>门票另收（约 80–100）</td><td>1.5 小时</td><td><b>晚上有琉璃塔点灯仪式</b>，每天颜色不同。<b>可顶替夫子庙做晚间项</b></td></tr>
+  <tr><td><b>老门东</b></td><td>—</td><td><b>免费街区</b></td><td>1.5–2 小时</td><td>小吃平价，4 人分吃最划算。<b>比夫子庙好逛</b>是全网一致评价</td></tr>
+</table>
+<div class="note">💰 <b>票价以购票当天官方为准</b>，上表是 2026-09 携程/同程在售价（明孝陵 67–70、美龄宫 28.5–30、音乐台 5–10、钟山四景联票 98–100）。学生证带上，<b>全日制学生收费景点半价</b>。</div>
+
+<h3>④ 城墙怎么上：选错段就白花钱 <span class="cost">1450 赞 · 1327 收藏</span></h3>
+<div class="card">
+  <strong>先搞清一件事：南京城墙开放段约 22 公里，分成好几段，彼此不连通、各卖各的票</strong>
+  <table>
+    <tr><th>段</th><th>长度 / 票价</th><th>能看到</th><th>建议</th></tr>
+    <tr style="background:#f0fdfa"><td><b>北线</b><br>神策门—玄武门—台城—九华山</td><td>约 6 km / <b>30 元</b></td><td>玄武湖、鸡鸣寺、九华山</td><td>⭐ <b>要上就上这段</b>。从解放门登城口上（鸡鸣寺出来就是），<b>一段城墙同时打卡鸡鸣寺 + 玄武湖 + 紫金山</b></td></tr>
+    <tr><td>南线<br>东水关—中华门—集庆门</td><td>约 6 km / <b>50 元</b></td><td>东水关、夫子庙、老门东、大报恩寺</td><td>时间多、想从高处看老门东可以选。但锐评说中华门亮点少</td></tr>
+    <tr><td>西线<br>清凉门—国防园</td><td>1.1 km / <b>免费</b></td><td>清凉山、石头城、外秦淮河</td><td>免费想走走可以，但位置偏，不顺路</td></tr>
+    <tr><td>东线<br>中山门—标营门</td><td>约 2 km / <b>5 元</b></td><td>紫金山、月牙湖</td><td>离你动线远，跳过</td></tr>
+  </table>
+  <div class="note">📝 那篇 1450 赞笔记的原话：<b>「时间有限优先选择解放门或者中华门登城」</b>。结合你的动线 —— 如果 10/1 走到鸡鸣寺/玄武湖，<b>花 30 元上解放门那段就够</b>；不去城北就别为城墙专门跑。</div>
+</div>
+
+<h3>⑤ 三条现成路线，可以直接抄 <span class="cost">都是高赞笔记原路线，未改动</span></h3>
+
+<div class="card">
+  <strong>A · 玄武湖环湖线（4131 赞）— 不走回头路</strong>
+  <div class="meta" style="font-size:14px;color:#475569;margin:6px 0">🚇 4 号线鸡鸣寺站 <b>5 号口</b>出 → 📍玄武湖景区（解放门）</div>
+  <p style="margin:4px 0"><b>古鸡鸣寺 → 解放门 → 武闸庙 → 月季园 → 月影桥 → 芳桥 → 先锋书店（玄武湖店）→ 玄武门 → 金茂览秀城</b></p>
+  <div class="meta" style="font-size:14px">· 武闸庙：那棵「孤独的树」，<b>周末要排队</b><br>
+  · 月季园：人少好拍，往湖边走 200 米能拍长堤垂柳<br>
+  · 月影桥 / 芳桥：有字的座椅，小红书上的网红机位<br>
+  · 出玄武门可到金茂览秀城吃饭（5 楼岐余食堂，鳗鱼饭是招牌），吃完 1 号线返程</div>
+  <div class="note" style="margin-bottom:0">💡 <b>这条线的价值</b>：它把鸡鸣寺 + 城墙 + 玄武湖 + 先锋书店 + 晚饭一气串完，全程走路不回头。<b>如果你 10/1 下午决定走老城线，这段直接照抄就行，约 3 小时。</b></div>
+</div>
+
+<div class="card">
+  <strong>B · 城南历史线（3778 赞 · 本地人推荐）— 全靠在一起</strong>
+  <p style="margin:4px 0"><b>朝天宫 → 熙南里 → 愚园 → 大报恩寺遗址 → 南京城墙博物馆 → 老门东 → 瞻园 → 夫子庙</b></p>
+  <div class="meta" style="font-size:14px">· 朝天宫：「金陵第一胜迹」，江南最大最完好的明清建筑群，南京小故宫<br>
+  · 熙南里：「南京」墙在这，旁边的<b>甘熙故居</b>（九十九间半）现在是民俗博物馆，能逛<br>
+  · 大报恩寺：杜牧「四百八十寺」的起源，<b>晚上有琉璃塔亮灯仪式</b><br>
+  · 老门东：江苏首家越剧博物馆也在这，免费</div>
+  <div class="note" style="margin-bottom:0">💡 作者原话「这些地方都靠在一起，走走逛逛拍照不费脚」。<b>这条线全程在城南，和老门东/夫子庙无缝衔接，是 10/1 下午 + 晚上最顺的选择。</b></div>
+</div>
+
+<div class="card">
+  <strong>C · 12 小时 i 人线（1637 赞）— 带具体钟点</strong>
+  <div class="timeline" style="margin:8px 0">
+    <div class="tl-row"><span class="tl-time">08:30</span><span>三七八巷吃早饭（汤包、馄饨、小元宵）</span></div>
+    <div class="tl-row"><span class="tl-time">09:30</span><span>骑车/步行去旁边的<b>老门东</b></span></div>
+    <div class="tl-row"><span class="tl-time">12:00</span><span>打车去<b>红庙</b>吃午饭（本地人去的一人食小店多）</span></div>
+    <div class="tl-row"><span class="tl-time">13:00</span><span>一枝园附近 citywalk</span></div>
+    <div class="tl-row"><span class="tl-time">14:40</span><span>骑车去<b>陶谷新村</b>逛小店</span></div>
+    <div class="tl-row"><span class="tl-time">15:50</span><span><b>颐和路</b>：先去先锋书店二楼拍颐和路全景，再下楼随便走</span></div>
+    <div class="tl-row"><span class="tl-time">16:50</span><span>步行到<b>西桥</b>（拍紫峰大厦的经典机位）</span></div>
+    <div class="tl-row"><span class="tl-time">17:20</span><span>打车定位<b>岗子村</b>，去玄武湖看日落</span></div>
+    <div class="tl-row"><span class="tl-time">19:00</span><span>看完日落去对面<b>锁金村</b>吃鸡蛋饼 + 鸭血粉丝</span></div>
+  </div>
+  <div class="note" style="margin-bottom:0">💡 这条是单人 solog 路线，<b>骑车段对你 4 人不适用，换成打车即可</b>。但它有两个点位很值得抄：<b>① 颐和路要先上先锋书店二楼拍全景；② 西桥是拍紫峰大厦的机位。</b></div>
+</div>
+
+<h3>⑥ 吃什么：带地址的店（从多篇高赞笔记里抄的）</h3>
+<table>
+  <tr><th>店</th><th>地址 / 位置</th><th>吃什么</th><th>来源</th></tr>
+  <tr><td><b>李记清真馆</b></td><td>打钉巷 1 号</td><td>牛肉锅贴、馄饨（口味偏甜，先少量尝）</td><td>已在你攻略里</td></tr>
+  <tr><td><b>鸡鸣汤包</b>（湖南路总店）</td><td>湖南路</td><td>现包现蒸的汤包</td><td>锐评榜「玄武湖区」推荐</td></tr>
+  <tr><td><b>朱大州</b>（夫子庙店）</td><td>夫子庙</td><td>本地菜</td><td>锐评榜「夫子庙区」推荐</td></tr>
+  <tr><td><b>苏小蟹</b></td><td>夫子庙</td><td>蟹类</td><td>锐评榜「夫子庙区」推荐</td></tr>
+  <tr><td><b>竺桥兄弟烤鸭</b>（竺桥店）</td><td>总统府周边</td><td>烤鸭</td><td>锐评榜「总统府区」推荐</td></tr>
+  <tr><td><b>颂福雅宴</b></td><td>黄埔路店</td><td>南京菜</td><td>锐评榜「总统府区」推荐</td></tr>
+  <tr><td><b>O'Luck 噢幸</b></td><td>景枫中心</td><td>—（新街口区推荐）</td><td>锐评榜「新街口区」</td></tr>
+  <tr><td><b>阿生鱼捞</b> / <b>多拿土耳其餐厅</b></td><td>新街口</td><td>—（新街口区推荐）</td><td>锐评榜「新街口区」</td></tr>
+  <tr><td><b>三七八巷</b></td><td>老门东旁</td><td>早餐：汤包、馄饨、小元宵</td><td>12h 路线 08:30</td></tr>
+  <tr><td><b>红庙</b></td><td>珠江路附近</td><td>午饭，本地人一人食小店多</td><td>12h 路线 12:15</td></tr>
+  <tr><td><b>锁金村</b></td><td>玄武湖对面</td><td>鸡蛋饼 + 鸭血粉丝</td><td>12h 路线 19:00</td></tr>
+</table>
+<div class="warn">⚠️ 另外三篇高赞笔记值得知道：<b>「从夯到拉锐评南京美食（鸭血粉丝版）」881 赞</b>、<b>「南京大牌档测评」2539 赞</b>、<b>「南京夫子庙真正好吃的 10 家」401 赞</b> —— 我没逐篇扒正文（省时间），<b>到了南京当天在小红书搜「南京大牌档测评」现看一眼</b>，比我现在抄更准。</div>
+
+<h3>⑦ 给你 10/1 的两套方案（选一套，别都塞）</h3>
+<div class="ok" style="margin-bottom:10px">✅ <b>两套方案里都没有任何一个需要预约的点。</b>颐和路、西桥、陵园路、梧桐大道、玄武湖、老门东全免费；明孝陵、美龄宫、音乐台、城墙、鸡鸣寺都是<b>到了门口买票就进</b>。<b>南博、中山陵、纪念馆则挂在 <a href="#pool">预备项目池</a> 里 —— 想抢可以抢，抢不到这两套方案照走。</b></div>
+
+<div class="src-note">📕 <b>先说清楚这三套的来源</b>，你可以据此决定信谁：<br>
+<b>· ⑤ 节（每日动线）里 10/1 用的那套，是照抄小红书 1638 赞「南京 12h」的原时刻表</b>，作者实走了一整天 —— <b>完整顺序：三七八巷 → 老门东 → 看展（可替换）→ 红庙 → 一枝园 → 陶谷新村 → 颐和路 → 西桥 → 玄武湖日落 → 锁金村</b>。<b>要省心就用它。</b><br>
+<b>· 下面 A / B 这两套，是我按 171 篇笔记的关键词（哪些点被反复提、哪些时段被反复推荐）聚合出来的</b>，<b>不是某一篇博主的原路线</b> —— 它们的好处是能对接我的地图与通勤数据，坏处是没有人真的按这个顺序走过一天。<br>
+<b>· 如果你就想抄一条现成的：</b><br>
+　<b>① 751 赞「南京宝藏 citywalk · 既松弛又浪漫」</b> —— 地铁云南路 5A 口 → 北京西路 → 颐和路 → 西桥 → 金银街 → 南秀村 → 陶谷新村 → 先锋书店五台山店（约 5 公里，2–3 小时，作者建议下午出发）；<br>
+　<b>② 3787 赞「南京本地人推荐的一日游路线」</b> —— <b>朝天宫 → 熙南里 → 愚园 → 大报恩寺遗址景区 → 南京城墙博物馆 → 老门东 → 瞻园 → 夫子庙</b>，作者原话「这些地方都靠在一起，走走逛逛拍照不费脚」。</div>
+<div class="card">
+  <strong>方案 A · 钟山线（强度高，梧桐最正宗）</strong>
+  <div class="timeline" style="margin:8px 0">
+    <div class="tl-row"><span class="tl-time">07:30</span><span>酒店早餐</span></div>
+    <div class="tl-row"><span class="tl-time">08:00–08:40</span><span>打车直奔<b>明孝陵</b>（<b>别坐地铁到孝陵卫，还要走 1.9 公里</b>；4 人打车分摊不贵）</span></div>
+    <div class="tl-row"><span class="tl-time">08:40–10:40</span><span><b>明孝陵 · 石象路</b>（约 70 元，学生半价）：石象路神道是南京秋天最出片的一段</span></div>
+    <div class="tl-row"><span class="tl-time">10:40–11:30</span><span><b>美龄宫</b>（约 30 元）：<b>小红书原话「美龄宫周边人更少更好拍」</b>，梧桐不输陵园路</span></div>
+    <div class="tl-row"><span class="tl-time">11:30–12:30</span><span><b>陵园路梧桐大道</b>顺路走一段（免费，就在路上，不用单独安排）</span></div>
+    <div class="tl-row"><span class="tl-time">12:30–14:00</span><span>午餐 + 移动回城</span></div>
+    <div class="tl-row"><span class="tl-time">14:00–15:00</span><span><b>音乐台</b>（5–10 元）喂鸽子，可选。累了就砍掉</span></div>
+    <div class="tl-row"><span class="tl-time">16:00–18:00</span><span>回酒店休整</span></div>
+    <div class="tl-row gap"><span class="tl-time">19:00–21:00</span><span><b>老门东</b>吃晚饭 + 逛街巷（9/30 已去过夫子庙，这里不重复）</span></div>
+  </div>
+  <div class="warn" style="margin-bottom:0">⚠️ <b>这一天要走 7 小时以上，石象路段很长。</b>门票合计约 <b>100–110 元/人</b>（学生半价后约 55–60）。<b>下雨就切方案 B。</b></div>
+</div>
+
+<div class="card">
+  <strong>方案 B · 老城线（强度低，我更推荐这版）⭐</strong>
+  <div class="timeline" style="margin:8px 0">
+    <div class="tl-row"><span class="tl-time">07:30–08:30</span><span><b>三七八巷</b>吃早饭（汤包、馄饨、小元宵），就在老门东旁</span></div>
+    <div class="tl-row"><span class="tl-time">09:00–10:30</span><span><b>颐和路公馆区</b>（<b>免费</b>）：法国梧桐 + 民国公馆。<b>先上先锋书店二楼拍公馆区全景</b></span></div>
+    <div class="tl-row"><span class="tl-time">10:30–11:00</span><span>步行到<b>西桥</b>，拍紫峰大厦机位（免费）</span></div>
+    <div class="tl-row"><span class="tl-time">11:30–12:30</span><span>午餐（<b>红庙</b>或新街口，本地人小店）<span class="cost">30–45 元/人</span></span></div>
+    <div class="tl-row"><span class="tl-time">13:30–14:10</span><span><b>鸡鸣寺</b>（买票就进，约 10 元，40 分钟速览）</span></div>
+    <div class="tl-row"><span class="tl-time">14:10–14:50</span><span><b>解放门登城墙</b>（<b>30 元</b>）—— 一段墙同时打卡鸡鸣寺 + 玄武湖 + 紫金山</span></div>
+    <div class="tl-row"><span class="tl-time">14:50–16:30</span><span><b>玄武湖</b>散步（免费，解放门下来就是）</span></div>
+    <div class="tl-row"><span class="tl-time">17:00–18:30</span><span>回酒店休整</span></div>
+    <div class="tl-row gap"><span class="tl-time">19:00–21:00</span><span><b>老门东</b>吃晚饭 + 逛街巷</span></div>
+  </div>
+  <div class="ok" style="margin-bottom:0">✅ <b>为什么推荐 B</b>：① 你要的<b>梧桐在颐和路就满足了</b>（小红书热度榜南京第一，5483 赞）；② 全程从东往西再往南，<b>几乎不折返</b>；③ 室内（先锋书店、鸡鸣寺）+ 室外各半，<b>下雨有退路</b>；④ 没有长距离暴走；⑤ <b>门票只要 40 元/人</b>（城墙 30 + 鸡鸣寺 10），其余全免费。<br>
+  <b>A 比 B 多的是明孝陵和美龄宫（钟山片区），代价是 100 元门票 + 7 小时暴走。</b>如果你特别想要「南京秋天最经典那种梧桐大片」，选 A；否则 B 更稳。</div>
+</div>
+
+<h3>⑧ 南京避坑（小红书集体劝退的）</h3>
+<div class="card">
+  <p>❌ <b>德基网红厕所、鱼嘴湿地公园、悦动新门西大字墙、长江大桥</b> —— 锐评榜直接归到「拉完了」，网红炒起来的，要么偏远要么可玩性极低，<b>时间紧直接 pass</b>。</p>
+  <p>❌ <b>别以为城墙是一整圈。</b>开放段 22 公里分成好几段，<b>彼此不连通、分别售票</b>。买错段等于白花钱。只上就上<b>解放门（北线，30 元）</b>。</p>
+  <p>❌ <b>别在夫子庙吃正餐。</b>商业化偏重是全网共识，<b>浅逛看夜景就行</b>。想吃饭去老门东（平价）或红庙（本地人）。</p>
+  <p>❌ <b>别为先锋书店专程跑一趟五台山店。</b>锐评原话「褪去打卡热度回归本身，只拍照没必要」。<b>但颐和路那家可以上二楼拍公馆区全景</b>，这个不一样。</p>
+  <p>❌ <b>别把玄武湖当成一整个景点来排。</b>它是本地人的后花园，锐评说「短途旅行不用专程来」。<b>只有傍晚顺路看日落才划算</b>。</p>
+  <p>🅟 <b>中山陵和南京博物院：不排，但可以从预备池里捞。</b>这两个都要线上抢预约，国庆量级基本抢不到，<b>抢不到就白排还打乱后面所有时间</b>，所以默认时间块里没有它们（见 <a href="#pool">预备项目池</a>）。<b>真要试就提前 7 天盯放票，抢到了再替换 10/1 上午</b>。替代：钟山片用明孝陵 + 美龄宫（买票就进），室内片用颐和路 + 先锋书店（免费不抢）。</p>
+  <p>❌ <b>地铁到「孝陵卫」≠ 到中山陵。</b>实测还要走 <b>1.9 公里</b>，这段必须坐景区观光车或打车。<b>4 人直接打车到景区门口更划算。</b></p>
+</div>
+
+<h2 id="s11">⑫ 苏州深度攻略（小红书 381 篇实抓 + 地图实测）</h2>
+
+<p>苏州段的数据来自小红书苏州相关笔记实抓 <b>381 篇</b>（14 组关键词：旅游攻略 / 园林攻略 / 拙政园早场 / 平江路攻略 / 平江路美食 / 山塘街夜景 / 网师园 / 沧浪亭 / 十全街 / 观前街美食 / 苏式面 / 双塔市集 / 避坑 / citywalk），其中 <b>5 篇高赞笔记读了正文</b>，加上腾讯地图实测的步行与车程。</p>
+
+<div class="warn">
+  ⚠️ <b>先认清时间：苏州你只有「1 个下午 + 1 个上午」。</b>10/2 11:00 出站、11:30 到酒店，10/3 11:50 就得回酒店取行李去赶 13:44 的 K371 —— 真正能玩的约 <b>9 小时</b>，中间还夹着一个晚上。<b>别按「苏州三日游」抄。</b>
+</div>
+
+<h3>① 热度榜：苏州人自己在聊什么 <span class="cost">381 篇样本 · 按点赞合计</span></h3>
+<table>
+  <tr><th style="width:20%">景点</th><th style="width:18%">点赞合计</th><th style="width:12%">推荐篇数</th><th style="width:14%">单篇最高</th><th>怎么读这一行</th></tr>
+  <tr><td><b>平江路</b></td><td><b>14,127</b></td><td>26 篇</td><td>6,186</td><td>绝对核心。苏州在小红书上的第一叙事就是这条街</td></tr>
+  <tr><td><b>十全街</b></td><td><b>10,376</b></td><td>24 篇</td><td>2,793</td><td><b>你酒店门口那条街本身就在榜二</b>，「不知道吃什么就去十全街」是本地共识</td></tr>
+  <tr><td><b>山塘街</b></td><td><b>9,795</b></td><td>24 篇</td><td>5,554</td><td>夜景派（「七里山塘晚上来才对」5554）。但国庆有劝退篇，见 ⑥</td></tr>
+  <tr><td><b>网师园</b></td><td><b>7,565</b></td><td>20 篇</td><td>5,355</td><td>「浮光跃金具象化了」5355 赞，<b>小而精的园子热度是拙政园的 3 倍</b></td></tr>
+  <tr><td>观前街</td><td>2,463</td><td>5 篇</td><td>1,652</td><td>离你酒店 2.1 公里，不值得专程</td></tr>
+  <tr><td><b>拙政园</b></td><td>2,294</td><td>22 篇</td><td>412</td><td>篇数不少但<b>单篇最高只有 412 赞</b> —— 名声大、内容火不起来</td></tr>
+  <tr><td>沧浪亭</td><td>1,144</td><td>20 篇</td><td>284</td><td>同样是「提到的人多、爆款少」，适合实地慢慢看</td></tr>
+  <tr><td>双塔市集</td><td>536</td><td>9 篇</td><td>208</td><td>市集型，热度不高但就在城南步行圈</td></tr>
+</table>
+<div class="note">📌 <b>这张榜最有价值的一条结论：苏州前四名里有三个是免费街区。</b>小红书在苏州传的是「免费的古城 + 夜游 + 小而精的园子」，不是「四大名园打卡」。所以你 10/2 下午的步行圈（网师园 + 沧浪亭 + 十全街）其实踩在了正确的方向上。</div>
+
+<h3>② 园林怎么选：九大园林票价与性格 <span class="cost">8855 赞「苏州最值得去的九大园林」</span></h3>
+<table>
+  <tr><th style="width:16%">园林</th><th style="width:12%">全价票</th><th>特点（原笔记要点 + 我们的判断）</th></tr>
+  <tr style="background:#f0fdfa"><td><b>网师园</b></td><td><b>40 元</b></td><td>小园典范，以彩霞池为核心，小桥流水 + 四时花木。<b>小红书出片主力就是它</b>（5355 赞「浮光跃金」）。<b>你酒店步行 7 分钟，10/2 下午必去</b></td></tr>
+  <tr style="background:#f0fdfa"><td><b>沧浪亭</b></td><td><b>20 元</b></td><td>苏州最古老的园林，被水围着，以山石为主景。<b>复廊是「苏州三大名廊」之一</b>（另两条在拙政园、留园）。步行 9 分钟，和网师园一左一右</td></tr>
+  <tr><td><b>拙政园</b></td><td><b>80 元</b></td><td>四大名园之一、中国最大私家园林。必打卡机位：<b>「海棠春坞」附近借景北寺塔</b>。⚠️ 原笔记原话：<b>「人非常多、商拍多」</b> —— 所以你 10/3 排 06:45 早场是对的</td></tr>
+  <tr><td>留园</td><td>55 元</td><td>四大名园之一，大窗多、适合框架构图。原笔记：人非常多、小景别拥挤不好出片。<b>你这次不排</b>（和拙政园重复度高）</td></tr>
+  <tr><td>狮子林</td><td>40 元</td><td>「假山王国」，洞壑像迷宫，<b>不太适合拍人像</b>。平江路旁边，有时间可顺路</td></tr>
+  <tr><td>艺圃</td><td><b>10 元</b></td><td>藏在老巷里的宝藏，亭台错落、<b>相对人少好拍</b>。10/2 下午若还想去第三个园子，它是性价比最高的</td></tr>
+  <tr><td>可园</td><td>25 元</td><td>苏州现存唯一书院园林，<b>人少很美</b>，原笔记「强推」。在城南，离沧浪亭不远</td></tr>
+  <tr><td>耦园</td><td>—</td><td>「爱情之园」，有苏州园林唯一的走马楼。⚠️ 商拍特别多</td></tr>
+</table>
+<div class="ok">✅ <b>给你的一句话结论：花 60 元（网师园 40 + 沧浪亭 20）看两个性格完全相反的园子，比花 80 元挤一次拙政园更值。</b>拙政园你已经排在 10/3 早场了，那是「名声 + 人少」的唯一窗口。</div>
+
+<h3>③ 平江路怎么逛 <span class="cost">6186 赞「苏州平江路攻略·看这一篇就够」</span></h3>
+<div class="card">
+  <strong>原笔记拆出来的可执行信息</strong>
+  <ul>
+    <li><b>支巷里的各大博物馆：免费、免预约（周一闭馆）</b> —— 这是平江路最被低估的部分。主路人挤人，<b>钻进支巷和博物馆反而好拍、人少</b></li>
+    <li><b>游船码头有两个</b>：一个在北出口，一个在评弹博物馆对面。手摇船是平江路的招牌体验</li>
+    <li><b>听评弹的三家</b>：平江文化中心（鸿儒曲院）、评弹博物馆（吴苑深处书场）、琵琶语评弹馆。<b>听不懂苏州话的去「光裕书厅」（观前街附近），唱词全程带字幕</b></li>
+    <li><b>小吃</b>：梅花糕、糖粥、卤鸡爪</li>
+    <li><b>交通</b>：地铁 <b>相门站 3 号口</b>出，步行约 450 米到南入口（比从北边进来顺）</li>
+    <li>附近有狮子林、拙政园、苏博；一路向西是阊门、西中市、七里山塘</li>
+  </ul>
+  <div class="note" style="margin-bottom:0">📝 你 10/3 是<b>从拙政园走 1 公里过来</b>，等于从北往南进，正好倒着走一遍，最后从南出口离场去酒店取行李 —— 路线是顺的。<b>苏博挂在预备项目池里（不占时间块），那 1.5 小时默认全部给平江路，正好够把支巷和博物馆逛透；<b>真抢到了就从 10/3 09:20–10:50 切给它</b>。</b></div>
+</div>
+
+<h3>④ 夜游：6840 赞那条「苏州最好的地方都是免费的」</h3>
+<div class="card">
+  <strong>原笔记给的夜游动线（nightwalk）</strong>
+  <p style="margin:6px 0 10px;font-size:13.5px">平江路·碑亭 → 遇见平江 → 手摇船码头 → 齐云楼 → 平江路北段 → 拙政园 → 苏州博物馆 → 山塘街 → 阊门</p>
+  <ul>
+    <li><b>推荐拍摄时间 18:30–19:30</b>（蓝调时刻，河灯刚亮，人还没堆满）</li>
+    <li><b>齐云楼一楼临河座位最出片，有昆曲表演</b> —— 苏式面馆，三虾面是招牌</li>
+    <li><b>苏博 & 拙政园夜游需要提前预约</b> —— <b>挂在预备项目池里，默认跳过</b>；抢到了可替换 10/2 19:00–20:30。默认路线从平江路北段继续走</li>
+    <li>终点阊门：站上城墙回望苏州</li>
+  </ul>
+  <div class="warn" style="margin-bottom:0">⚠️ <b>这条线要走 3–4 小时，你 10/2 的晚上排不下。</b>可执行的缩水版：<b>19:00 从酒店出发 → 山塘街（地铁 36 分钟）→ 20:30 返程</b>，只保留灯笼 + 河道那段（5554 赞「苏州夜景天花板」说的就是它）。<b>平江路留到 10/3 上午白天逛</b>，白天看建筑、晚上看灯，两者不重复。</div>
+</div>
+
+<h3>⑤ 吃什么：本地人给出的答案 <span class="cost">3534 赞国庆专篇 + 7132 赞「12 家好店」</span></h3>
+<table>
+  <tr><th style="width:26%">店 / 街区</th><th style="width:16%">在哪</th><th>吃什么 / 怎么用</th></tr>
+  <tr style="background:#f0fdfa"><td><b>十全街</b></td><td>酒店步行 8 分钟</td><td>本地人的原话是<b>「单纯不知道吃什么，就是想随便吃点好吃的，请前往十全街」</b>。它是你这次的兜底选项，走累了随时能回</td></tr>
+  <tr><td><b>芳元食里</b></td><td>护城河内（古城里）</td><td>想吃<b>苏帮菜</b>时的城内选择。<b>结界外</b>（园区方向）对应的是「江南雅厨（李公堤）」</td></tr>
+  <tr style="background:#f0fdfa"><td><b>双塔市集</b></td><td>城南，古城内</td><td>吃完后<b>向南沿叶家弄走</b>，入夜是「姑苏幽巷灯影浮」那段。⚠️ 原笔记特意加了一句「建议少来，因为你们都来了我怎么逛」——<b>已经被游客挤满了</b></td></tr>
+  <tr><td><b>三萬昌</b></td><td>观前街一带</td><td>本地最有名的茶叶铺，碧螺春是特产。<b>近年新出的奶茶与桃酥评价很好</b>，适合带伴手礼</td></tr>
+  <tr><td>光裕书厅</td><td>观前街附近</td><td>评弹，<b>唱词全程带字幕</b>，听不懂吴语也能看</td></tr>
+  <tr><td>平江路小吃</td><td>平江路主街</td><td>梅花糕、糖粥、卤鸡爪（10/3 上午边走边吃）</td></tr>
+  <tr><td>齐云楼</td><td>平江路手摇船码头旁</td><td>苏式面，<b>三虾面</b>；一楼临河座位有昆曲</td></tr>
+</table>
+
+<h3>⑥ 国庆专属：3534 赞「苏州规则怪谈」翻译成人话</h3>
+<div class="card">
+  <strong>这篇是国庆/中秋期间发的，句句都在说「假期别这么干」</strong>
+  <table>
+    <tr><th style="width:44%">原话（怪谈版）</th><th>人话</th></tr>
+    <tr><td>① 不要拜访「七里山塘」，会变得不幸</td><td>❌ <b>国庆的山塘街别去。</b>人挤到走不动。<b>这条直接推翻了 10/2 晚上的原计划</b> —— 见下面 ⑦ 的改法</td></tr>
+    <tr><td>② 不要在清晨之外的任何时间拜访「拙政园」</td><td>✅ <b>你 10/3 的 06:45 早场正好对了</b>。这是全篇唯一被验证的决策</td></tr>
+    <tr><td>③ 忘了预约苏博本馆？那就继续忘了它</td><td>🅟 已挂进预备项目池，不占时间</td></tr>
+    <tr><td>④ 看到兜售「苏式绿豆汤」立即撤离</td><td>❌ 别买。那是游客专供</td></tr>
+    <tr><td>⑤ 「苏式火锅」不存在</td><td>❌ 看见这个招牌直接走，是生造概念</td></tr>
+    <tr><td>⑥ 9/28 前「阳澄湖大闸蟹」不存在</td><td>🟡 你 10/2 到，<b>时间上过了这条线</b>，但吃蟹仍要问清产地，别信招牌</td></tr>
+    <tr><td>⑦ 请不要食用蟹黄汤包（非要吃去「山塘老街·蟹黄汤包馆」）</td><td>❌ 景点周边一律不碰</td></tr>
+    <tr><td>⑧ 别为「夜半钟声」去寒山寺，那里不敲钟</td><td>❌ 你本来就没排，保持</td></tr>
+    <tr><td>⑨ 护城河内活动时长 &lt; 苏州总时长 60%，判定为「没来过苏州」</td><td>✅ <b>你的动线 95% 在古城内</b>（网师园、沧浪亭、十全街、平江路全在护城河里），这条是加分项</td></tr>
+    <tr><td>⑩ 人流密集区自动刷新「黄包车」NPC，坐了会变得不幸</td><td>❌ 别坐。平江路、拙政园门口那些三轮，报价虚高</td></tr>
+  </table>
+  <div class="ok" style="margin-bottom:0">✅ <b>背面的自救指南里两条最有用：</b>① 已经「变得不幸」就出护城河去<b>西园寺</b>（本地人降噪去处）；② <b>不知道吃什么就去十全街</b>。</div>
+</div>
+
+<h3>⑦ 苏州避坑（含 1993 赞那条打车血泪）</h3>
+<div class="danger">
+  <p>❌ <b>去山塘街打车，必须定位「七里山塘景区」，别只搜「山塘街」。</b>1993 赞那篇的教训：定位「山塘街」的下车点离真正的景区入口还有 <b>2.4 公里</b>，最后被摩的师傅 15 元拉过去。<b>坐地铁则相反：坐到「山塘街站」是对的。</b>两个导航名差两个字，差出两站地。</p>
+  <p>❌ <b>国庆晚上别安排山塘街。</b>规则怪谈第 ① 条就是它，5554 赞那篇说的是非假期的夜景。<b>10/2 晚上改成十全街 + 网师园夜游（若开放）/ 或直接休整</b>，把体力留给 10/3 的 05:20 起床。</p>
+  <p>❌ <b>别把苏博当「免费就能进」。</b>免费但必须分时预约，国庆早就满了。已挂进预备项目池（不占时间块），那 1.5 小时默认并进平江路。</p>
+  <p>❌ <b>酒店名字骗人。</b>「来住酒店（苏州观前十全街店）」实际在<b>竹辉路 358 号</b>，离观前街 2.1 公里。别照酒店名规划路线。</p>
+</div>
+
+<h3>⑧ 10/2 下午的两条走法（选一条）</h3>
+<div class="card">
+  <strong>方案 A · 城南步行慢逛（推荐，零车程）</strong>
+  <p class="meta">11:30 酒店寄存 → 南门/十全街午餐（苏式面 20–35 元）→ 13:00 网师园（步行 7 分）→ 14:00 沧浪亭（步行 9 分）→ 15:00–17:30 十全街慢走 + 咖啡 → 17:30 回酒店 → 晚餐<br>
+  <b>优点：</b>全程步行，一次车都不用坐；踩中热度榜前二（网师园 + 十全街）。<b>缺点：</b>园林是「小而精」，不是「大而震撼」。</p>
+</div>
+<div class="card">
+  <strong>方案 B · 加一个园子 / 加双塔市集</strong>
+  <p class="meta">同样从酒店步行出发，但把沧浪亭换成<b>可园（25 元，人少很美）</b>或加进<b>双塔市集 + 叶家弄夜巷</b>。<br>
+  <b>适合：</b>网师园半小时就逛完了、下午还剩大把时间的情况。<b>艺圃（10 元）也是同一档的备选。</b></p>
+</div>
+<div class="note">📝 <b>两套方案都不含任何需预约的点</b>（网师园、沧浪亭、可园、艺圃全是门口买票）。拙政园是 10/3 早场的事，需要提前 1–7 天在「苏州园林旅游」实名分时购票 —— <b>它是全苏州唯一要抢的一个</b>。</div>
+
+
+<h2 id="s12">⑬ 上海深度攻略（小红书 329 篇实抓 + 通勤实测）</h2>
+
+<p>上海段数据来自小红书实抓 <b>329 篇</b>（12 组关键词：旅游攻略 / 外滩夜景 / 外滩攻略 / 南京路步行街 / 豫园城隍庙 / 武康大楼武康路 / 安福路 / 陆家嘴滨江 / 本帮菜 / 避坑 / citywalk / 北外滩），其中 <b>5 篇高赞笔记读了正文</b>，通勤为腾讯地图 2026-09-28 实测。</p>
+
+<div class="warn">
+  ⚠️ <b>先认清时间：上海你只有「1 个整天 + 2 个晚上」。</b>10/3 14:46 到上海站，10/5 12:20 就要在松江站上车 —— 真正完整的是 <b>10/4 一天</b>，加上 10/3 一个晚上。<b>别按「上海三日游」抄。</b>
+</div>
+
+<h3>① 热度榜：上海人自己在聊什么 <span class="cost">329 篇样本 · 按点赞合计</span></h3>
+<table>
+  <tr><th style="width:20%">景点</th><th style="width:18%">点赞合计</th><th style="width:12%">推荐篇数</th><th style="width:14%">单篇最高</th><th>怎么读这一行</th></tr>
+  <tr><td><b>外滩</b></td><td><b>38,609</b></td><td>64 篇</td><td>8,791</td><td>仍是第一，但 64 篇里有大量「怎么避开人」的内容</td></tr>
+  <tr><td><b>南京路步行街</b></td><td><b>17,748</b></td><td>16 篇</td><td>8,791</td><td>和外滩是同一条线，通常一起出现</td></tr>
+  <tr style="background:#f0fdfa"><td><b>北外滩</b></td><td><b>16,767</b></td><td>33 篇</td><td>4,993</td><td>⭐ <b>用一半的篇数拿到外滩 43% 的火力</b>。它最爆的标题是「3km 江景不用挤，夜景随便拍」——<b>这是国庆最该记住的替代方案</b></td></tr>
+  <tr><td><b>豫园 / 城隍庙</b></td><td><b>14,704</b></td><td>14 篇（3 劝退）</td><td>3,911</td><td>离你酒店 2.6 公里。劝退篇主要骂商业化，<b>但本地人说「老字号都能在那吃到」</b></td></tr>
+  <tr><td><b>武康大楼 / 武康路</b></td><td><b>11,511</b></td><td>14 篇（2 劝退）</td><td>5,307</td><td>网红顶流，但有 2 篇劝退（「比起武康路，我更喜欢这条路线」5411 赞）——<b>被高估</b></td></tr>
+  <tr><td>安福路</td><td>8,260</td><td>21 篇</td><td>1,870</td><td>潮人 / 咖啡 / 买手店，和武康路连着走</td></tr>
+  <tr><td>陆家嘴 / 东方明珠</td><td>3,800</td><td>28 篇</td><td>1,692</td><td>篇数多但火力低 —— 大家都去，但没人夸</td></tr>
+</table>
+<div class="note">📌 <b>一句话：外滩的热度，一半是「外滩本身」，一半是「怎么不去外滩」。</b>北外滩、2 元轮渡、滨江步道这些替代路线占了 33 篇，这就是国庆最实用的部分。</div>
+
+<h3>② 外滩怎么玩：4993 赞那篇「亲测北外滩 vs 外滩」</h3>
+<div class="card">
+  <strong>原笔记（春节初三 17–20 点实测）的核心对比</strong>
+  <table>
+    <tr><th style="width:22%">对比项</th><th>外滩</th><th>北外滩</th></tr>
+    <tr><td>人流</td><td>「17–20 点像春运候车室，南京路口人挤人被推着走」</td><td><b>同样时间，江边步道还能从容散步</b></td></tr>
+    <tr><td>灯光</td><td>「很暗，拍人不好看」</td><td><b>柔和，人脸被照亮，拍人像有质感</b></td></tr>
+    <tr><td>机位</td><td>上观景台要绕路、排队</td><td><b>不用抢机位</b></td></tr>
+    <tr><td>看对岸</td><td>看陆家嘴（经典）</td><td><b>离东方明珠更近更震撼</b></td></tr>
+  </table>
+  <p style="margin:10px 0 6px"><b>他给的两条步行动线（照抄即可）：</b></p>
+  <ul>
+    <li><b>从外滩转北外滩</b>：南京路 → 外滩（<b>别上观景台</b>）→ 北京东路口上观景台（人少）→ 圆明园路外滩源 → 乍浦路桥 → 外白渡桥 → <b>黄浦路 20 号岗亭左边台阶上去</b>（秘境入口）→ 灯塔 → Manner 旁楼梯机位 → 小巨蛋</li>
+    <li><b>纯北外滩线</b>：定位「<b>北外滩航海公园</b>」→ 小巨蛋 → 右转沿滨江到灯塔 → 世界会客厅 → 外白渡桥 → 乍浦路桥 → 外滩源 → 北京东路观景台 → 南京路</li>
+  </ul>
+  <div class="warn" style="margin-bottom:0">⚠️ <b>别改成「只去北外滩」。</b>外滩是上海的门面，第一次来还是要看一眼。<b>正确用法：19:00 先站外滩看经典天际线，20:00 后走到北外滩慢慢拍</b> —— 两处都拿到，人最多的时段躲开一半。</div>
+</div>
+
+<h3>③ 9136 赞「上海最好的地方都是免费的」：一整条免费线</h3>
+<div class="card">
+  <strong>原笔记给的打卡链（全部免费）</strong>
+  <p style="margin:6px 0 10px;font-size:13.5px">马勒别墅 → <b>武康大楼</b> → 一尺花园（香樟花园店）→ 何东旧居 → 沙美大楼 → 礼和洋行 → <b>益丰外滩源</b>（红砖洋楼与东方明珠同框）→ <b>上海邮政博物馆</b>（"上海之门"）→ 北外滩 → 北外滩滨江绿地（小巨蛋二楼机位俯拍）→ <b>浦东美术馆观景台</b></p>
+  <ul>
+    <li><b>武康大楼</b>：晴天拍过马路，<b>雨天拍倒影</b></li>
+    <li><b>益丰外滩源</b>：北京东路，「上海最出片的城市框景机位」</li>
+    <li><b>浦东美术馆观景台</b>：陆家嘴地铁站出来直达，<b>18:30 之后拍日落 + 外滩亮灯</b></li>
+    <li><b>交通提示（原笔记）</b>：上午步行漫游老街区，下午地铁 + 轮渡组合；<b>北外滩 → 浦东美术馆坐「东金线」轮渡，刷交通卡/随申码直接上船，航程约 10 分钟</b>，傍晚还能看江上日落，注意末班</li>
+  </ul>
+  <div class="note" style="margin-bottom:0">📝 这条线<b>走完要一整天</b>，你 10/4 只有一天，不可能全抄。<b>可执行的取舍：上午只取「武康大楼 + 武康路 + 安福路」这一段（09:00–12:00），傍晚取「外滩 → 北外滩」（19:00–21:00）</b>，中间的洋房机位放弃 —— 它们分散在黄浦、静安两头，串起来要穿越整个市中心。</div>
+</div>
+
+<h3>④ 2 元轮渡：最便宜的一次过江 <span class="cost">3805 赞保姆级攻略</span></h3>
+<div class="card">
+  <ul>
+    <li><b>票价 2 元</b>，刷交通卡或随申码直接登船，不用提前买票</li>
+    <li>三条热门线里，你用得上的是<b>东金线（去浦东美术馆方向）</b>和<b>泰公线（北外滩附近，人少）</b></li>
+    <li><b>它同时是交通工具 + 观景项目</b>：10 分钟航程，白天看两岸建筑，傍晚看日落</li>
+    <li>⚠️ 务必查<b>末班时间</b>，晚上收班早；国庆可能加开或限流，当天再看</li>
+  </ul>
+  <div class="ok" style="margin-bottom:0">✅ <b>怎么用进你的行程：</b>10/4 下午在陆家嘴（14:00–17:00）看完江对岸，<b>坐轮渡回浦西比坐地铁更有记忆点</b>；或者反过来，从外滩坐东金线去浦东美术馆观景台看日落。</div>
+</div>
+
+<h3>⑤ 吃什么：5357 赞本地土著的实话</h3>
+<table>
+  <tr><th style="width:26%">他说的话</th><th>怎么用</th></tr>
+  <tr style="background:#f0fdfa"><td><b>「所有餐厅都去大众点评看一眼，评分 4.8 且人均 150 以上的基本不踩雷；人均低的可能只是因为便宜才评分高」</b></td><td>⭐ <b>这条最值钱。</b>上海是全国用大众点评最多的城市，<b>小红书推的店很多是 4.5 以下</b>。<b>先小红书找店名，再大众点评验评分</b>，两步走</td></tr>
+  <tr><td><b>「绝大部分网红食品都可以点外卖」</b>：小杨生煎、佳家汤包（小笼）、胡小七锅贴、莉莲蛋挞、the rolling 瑞士卷</td><td>✅ <b>不用排队</b>，回酒店点外卖送到还是热的。⚠️ 别买盗版「rolling Beans」；莉莲别买蛋白三角</td></tr>
+  <tr style="background:#f0fdfa"><td><b>「城隍庙和豫园不用买门票进去，在外面逛就行」</b></td><td>✅ 省钱省时间。<b>你 10/3 晚上就是这么安排的</b>，只逛街区看灯</td></tr>
+  <tr><td><b>「城隍庙晚上有夜市，夜景好看；上海的老字号/特产/特色小吃基本都能在那买到，时间紧很值得去」</b></td><td>✅ 虽然 3 篇劝退骂商业化，但<b>本地人承认它「一站式」的价值</b>。<b>吃可以，别在里面买贵的伴手礼</b></td></tr>
+  <tr><td><b>「鲜肉月饼永远吃刚出炉热的」</b></td><td>几家老字号都行，<b>关键是一个"热"字</b>。路过买，别囤</td></tr>
+  <tr><td>「去寺庙去龙华寺，不要门票，香免费，素面很有名」</td><td>🟡 你行程里没排寺庙，知道即可</td></tr>
+  <tr><td>⚠️ <b>「外滩十点关灯」</b></td><td>❗ <b>22:00 熄灯。</b>你 10/4 排 19:00–21:00 是对的，<b>别拖到 21:30 以后才到</b></td></tr>
+</table>
+
+<h3>⑥ 上海避坑</h3>
+<div class="danger">
+  <p>❌ <b>别在国庆的外滩现场等出租车。</b>外滩—南京东路一带会交通管制，散场时打车 20 分钟起不来是常态。<b>回程走到 10 号线南京东路站坐地铁回陆家浜路（37 分 / 3 元）</b>，这是全篇最该记住的一条。</p>
+  <p>❌ <b>22:00 外滩关灯。</b>晚了就只剩黑江。你的时间窗是 19:00–21:00，20:00 后转北外滩正好接上。</p>
+  <p>❌ <b>武康路别抱太大期待。</b>14 篇里有 2 篇劝退，最狠的一篇是「比起武康路，我更喜欢上海这条 Citywalk 路线」5411 赞。<b>它的正确用法是「拍照 1 小时 + 安福路喝杯咖啡」，不是半天</b>。另外别堵居民门口拍照。</p>
+  <p>❌ <b>陆家嘴不上付费观景层。</b>28 篇提到但火力只有 3800 —— 大家都去、没人夸。<b>地面 + 滨江大道看对岸外滩天际线就够了</b>，省下的钱去吃顿好的。</p>
+  <p>❌ <b>别信小红书单篇餐厅推荐。</b>本地人原话：上海的大餐厅 <b>4.5 分以下不要考虑</b>。<b>先搜小红书拿名字，再用大众点评验评分</b>。</p>
+</div>
+
+<h3>⑦ 10/4 的两条走法（选一条）</h3>
+<div class="card">
+  <strong>方案 A · 经典线（攻略原版，强度中）</strong>
+  <p class="meta">08:45 打车去武康大楼（17 分 / 21 元）→ 武康路 + 安福路走到 12:00 → 安福路午餐 → 13:30 打车去陆家嘴（20 分 / 32 元）→ 14:00–17:00 陆家嘴地面 + 滨江 → <b>2 元轮渡回浦西</b> → 17:20 南京路 → 19:00 外滩 → 20:00 转北外滩 → 21:00 地铁回<br>
+  <b>优点：</b>一条不回头的线，把热度榜前六全覆盖。<b>缺点：</b>打车 4 趟（约 30 元/人），走路约 8 公里。</p>
+</div>
+<div class="card">
+  <strong>方案 B · 省力线（下雨 / 有人累）</strong>
+  <p class="meta">上午睡到自然醒 → 陆家浜路吃早点 → <b>9 号线直达打浦桥 / 嘉善路一带逛吃（地铁 3 元）</b> → 下午徐家汇商圈室内 → 傍晚地铁到南京东路 → 19:00 外滩 → 北外滩 → 地铁回<br>
+  <b>优点：</b>全程地铁，不依赖打车，雨天友好。<b>缺点：</b>放弃武康路那段（但那本来就有劝退篇）。</p>
+</div>
+<div class="note">📝 <b>两套方案都不含需预约的点</b>（外滩、南京路、北外滩、武康路、陆家嘴全部免费开放；<b>上博挂在预备项目池</b>，约到可替换陆家嘴、或当下雨兜底）。<b>10/3 晚上只做一件事：豫园城隍庙亮灯</b>（打车 9 分钟），落地带行李时别硬撑去外滩。</div>
+
+
+<h2 id="s13">⑭ 杭州深度攻略（小红书 336 篇实抓 + 地图实测）</h2>
+
+<p>杭州段数据来自小红书实抓 <b>336 篇</b>（12 组关键词：旅游攻略 / 西湖一日游 / 西湖攻略 / 断桥白堤 / 苏堤曲院风荷 / 河坊街南宋御街 / 杭州美食 / 片儿川 / 西湖日落 / 龙井峡漂流 / 避坑 / 西湖游船），其中 <b>5 篇高赞笔记读了正文</b>，通勤为腾讯地图实测。</p>
+
+<div class="warn">
+  ⚠️ <b>先认清时间：杭州是「1 个傍晚 + 1 个整天 + 1 个上午」。</b>10/5 15:08 才到酒店，10/7 15:00 就得回酒店拿行李去赶 17:40 的车。<b>10/6 是漂流预留日</b>（票务未锁）—— 所以它同时也是 <b>西湖整日的备份方案</b>，两种情况都要有路线。
+</div>
+
+<h3>① 热度榜：小红书在教怎么「省力地玩西湖」 <span class="cost">336 篇样本 · 按点赞合计</span></h3>
+<table>
+  <tr><th style="width:20%">景点</th><th style="width:18%">点赞合计</th><th style="width:12%">推荐篇数</th><th style="width:14%">单篇最高</th><th>怎么读这一行</th></tr>
+  <tr><td><b>西湖</b></td><td><b>129,821</b></td><td>132 篇</td><td>8,363</td><td><b>12.98 万赞、132 篇，四城最集中的一个单点。</b>它不是一个景点，是一整片区域</td></tr>
+  <tr style="background:#f0fdfa"><td><b>水上公交（3 元）</b></td><td><b>4,738</b></td><td>1 篇</td><td>4,738</td><td>⭐ <b>第二名不是景点，是一种玩法。</b>「来杭州一定要坐 3r 水上公交」—— 低成本玩西湖的代表</td></tr>
+  <tr><td>河坊街</td><td>2,094</td><td>6 篇</td><td>1,243</td><td>10/5 晚上的短逛选项，离得近</td></tr>
+  <tr><td>灵隐寺</td><td>1,076</td><td>4 篇（2 劝退）</td><td>839</td><td>🅟 <b>预备（不占时间块）。</b>免票后改线上候补，国庆难抢；候补成功可替换 10/6 上午</td></tr>
+  <tr><td>南宋御街</td><td>887</td><td>6 篇</td><td>463</td><td>和河坊街连着，一并短逛</td></tr>
+  <tr><td>白堤 / 断桥</td><td>538 / 534</td><td>3 / 2 篇</td><td>530</td><td>名气最大但热度一般 —— <b>因为人多到没人在那儿拍照</b></td></tr>
+</table>
+<div class="note">📌 <b>最有信息量的一条：单篇最高赞不是「西湖一日游」，而是「西湖半日游，低精力 + 带父母少走路路线」（8363 赞）</b>，同类的「不费体力版」4741 赞也进了前五。<b>小红书现在教的是「怎么少走路地把西湖玩明白」</b> —— 这正好对应你 10/7 只有半天、还要赶车的现实。</div>
+
+<h3>② 西湖的三段：别把它当成一个点</h3>
+<table>
+  <tr><th style="width:20%">段</th><th style="width:24%">范围</th><th>特点与判断</th></tr>
+  <tr><td><b>北线（人最多）</b></td><td>断桥 → 白堤 → 孤山 → 岳庙</td><td>名气最大的一段，<b>国庆人贴人</b>。本地笔记原话：<b>「柳浪闻莺能看到一大片湖景，我觉得比在断桥残雪那边看到的湖景要美」</b>。<b>你 10/7 上午走的就是这段，做好心理准备</b></td></tr>
+  <tr style="background:#f0fdfa"><td><b>西线（人最少）</b></td><td>曲院风荷 → 茅家埠 → 乌龟潭 → 浴鹄湾 → 太子湾</td><td>⭐ <b>本地人推荐的一段</b>：花草树木丰茂、大片的绿，<b>「浴鹄湾人不算多，很宁静，廊桥很有水墨江南的意境」</b>；乌龟潭有溪水、鸟叫、摇橹船。<b>要看「西湖的安静面」就走这里</b></td></tr>
+  <tr><td><b>南线（视野最好）</b></td><td>柳浪闻莺 → 长桥 → 雷峰塔 → 净慈寺</td><td><b>看大片湖景和日落最好</b>：柳浪闻莺、长桥公园看绝美日落；<b>净慈寺（10 元）在雷峰塔对面，能拍雷峰塔的经典机位，还有南屏晚钟</b></td></tr>
+</table>
+
+<h3>③ 6 元西湖游船：3011 赞那条「秘境路线」</h3>
+<div class="card">
+  <strong>原笔记的路线与价格（这是全杭州性价比最高的一件事）</strong>
+  <p style="margin:6px 0 10px;font-size:13.5px">曲院风荷 4 号门 → <b>坐一站西湖游船（6 元）到茅家埠</b> → 再坐一站（8 元）到花港观鱼 → 乌龟潭 → 浴鹄湾 → 太子湾 → 净慈寺（10 元）</p>
+  <ul>
+    <li><b>这个船又叫「公交船」，顺时针环西湖一圈，每个站点可上下，每站 6–8 元</b> —— 不是景区游船，是公共交通</li>
+    <li><b>上船点在曲院风荷 4 号门，进去右手边走 5 分钟</b>（找不到就导航「中美友谊井」）。<b>这个码头平时人很少</b>，电子屏能看到余位和到站时间</li>
+    <li><b>交通</b>：地铁 1 号线到武林广场站，或西湖文化广场站，<b>换乘 318 路公交到「杭州花圃」，对面就是曲院风荷 4 号门</b></li>
+    <li>沿途能远眺雷峰塔、三潭印月、城隍阁；<b>茅家埠静谧清幽，乌龟潭有摇橹船，浴鹄湾有古风长廊</b></li>
+    <li>⚠️ 另一篇本地笔记补充：<b>水上公交要登记手机号尾号和人数，可能要等 30 分钟以上</b>（曲院风荷→花港观鱼 14 元 / 20 多分钟）。<b>别卡时间坐</b></li>
+  </ul>
+  <div class="ok" style="margin-bottom:0">✅ <b>为什么这条最适合你：</b>它一次解决三件事 —— <b>便宜（全程 14–18 元）、省力（船代替走路）、去的是西线人少的那半边</b>。<b>10/6 如果漂流没成行，这就是首选。</b></div>
+</div>
+
+<h3>④ 3 元水上巴士：4738 赞「恢复能量」的那条</h3>
+<div class="card">
+  <ul>
+    <li><b>7 号线是最美的一条：坝子桥 ↔ 梅花碑，全程 4 公里、约 40 分钟、3 元</b></li>
+    <li><b>坝子桥上船</b>：坐地铁到<b>宝善桥</b>；<b>梅花碑上船</b>：坐地铁到<b>江城路</b>再走一会儿</li>
+    <li>沿途会穿过很多<b>漂亮的桥洞</b>，两岸绿意浓 —— 它走的是城市河道，不是西湖</li>
+    <li>⚠️ <b>它和 ③ 的「西湖公交船」是两套系统</b>：一个在城里运河（3 元），一个在西湖里（6–8 元/站）。<b>时间够可以都坐，不够优先西湖那个</b></li>
+  </ul>
+</div>
+
+<h3>⑤ 吃什么：4517 赞「夯到拉」+ 3848 赞本地避雷</h3>
+<table>
+  <tr><th style="width:24%">店 / 东西</th><th style="width:16%">在哪</th><th>怎么吃</th></tr>
+  <tr style="background:#f0fdfa"><td><b>片儿川</b></td><td>奎元馆（解放路店）</td><td>杭州的招牌面。<b>已在 10/7 行程里（25–45 元/人）</b>。<b>点单前先看价</b>，老字号有高价档</td></tr>
+  <tr><td><b>九月生活 · 榨菜鲜肉月饼</b></td><td>连锁</td><td>本地笔记唯一夸的饼：「<b>其他面包就是普通水平，榨菜鲜肉月饼值得一尝</b>」</td></tr>
+  <tr><td><b>赵宝美 · 生煎包</b></td><td>市区</td><td>「生煎超级酥脆，<b>但馄饨很普通</b>」—— 只点生煎</td></tr>
+  <tr><td>巴比馒头 · 坚果馒头</td><td>连锁</td><td>「很香，甜但不腻」，当路上干粮</td></tr>
+  <tr><td>李若桃 · 奉节脐橙白糯米酸奶</td><td>市区</td><td>「暴走 3 万步回酒店喝上简直美哉」，<b>解渴型</b></td></tr>
+  <tr style="background:#fef2f2"><td>❌ 泮芳春煎饺</td><td>市区</td><td>本地笔记原话：<b>「煎饺和咸豆浆实在太咸了，个人完全无法接受」</b>。口味清淡的别去</td></tr>
+</table>
+<div class="warn">⚠️ <b>河坊街 / 南宋御街只适合短逛</b>（10/5 晚上 19:30 后），<b>吃饭别在里面解决</b> —— 和南京夫子庙是同一类问题：商业化、贵、不正宗。</div>
+
+<h3>⑥ 10/6 的两条方案（漂流 vs 西湖，二选一）</h3>
+<div class="card">
+  <strong>方案 A · 龙井峡漂流（原计划，票务未锁）</strong>
+  <p class="meta">06:30 出发 → 07:00–11:30 市区 → 昌化 → 游客中心 → 12:30–15:00 漂流 → 15:00–20:00 返程<br>
+  ⏳ <b>必须先打电话 0571-63750573 确认：</b>10/6 是否开漂、最晚检票时刻、单漂票是否含景交、2916 路在「大龙湾路口」的经过时刻、昌化回杭州的末班。<b>任何一项接不上就改方案 B。</b></p>
+</div>
+<div class="card">
+  <strong>方案 B · 纯西湖整日（停漂 / 下雨 / 有人累时的默认方案）</strong>
+  <p class="meta">08:30 出门（地铁 10 号线 → 换 318 路到杭州花圃）→ <b>09:30 曲院风荷 4 号门上船 → 茅家埠（6 元）</b> → 11:00 乌龟潭 → 浴鹄湾（廊桥）→ 12:30 太子湾/花港观鱼午餐 → <b>14:00 净慈寺（10 元，拍雷峰塔机位 + 南屏晚钟）</b> → 16:30 柳浪闻莺 / 长桥公园看日落 → 18:30 晚餐<br>
+  <b>优点：</b>全程在西线 + 南线，<b>完美绕开断桥那个人堆</b>；坐船代替走路，体力消耗只有北线的一半。<b>缺点：</b>看不到「断桥」这个地标（但你觉得非看不可的话，10/7 上午已经排了）。</p>
+</div>
+
+<h3>⑦ 杭州避坑</h3>
+<div class="danger">
+  <p>🅟 <b>灵隐已挂进预备项目池（不占时间块），别临场赌放票。</b>2025/12/1 起飞来峰景区（含灵隐寺）免票，2026/2/1 起取消现场登记、改线上候补 —— <b>免费反而更难进</b>。4 篇笔记里有 2 篇是劝退，其中「灵隐寺避雷不踩坑」2688 赞。<b>旧攻略里「买飞来峰门票 + 香花券」的写法已经作废。</b></p>
+  <p>❌ <b>别把 10/7 上午排在断桥上耗掉。</b>断桥—白堤是西湖最挤的一段，你只有 2 小时还要赶车。<b>走 08:30–10:30 这一小段就收</b>，别一路走到孤山尽头。</p>
+  <p>❌ <b>回酒店取行李的时间别卡太死。</b>10/7 的节奏是：12:00 午餐 → 14:00 回酒店 → 15:00 去火车站（文三路 → 杭州站 35 分 / 3 元）→ 16:40 候车。<b>出发前 2 天核对票面站名</b>，若是杭州东站或南站，去站时间要重算（两个都更远）。</p>
+  <p>❌ <b>灵隐寺外还有个坑：「西湖边的龙井村」≠ 临安的龙井峡漂流。</b>两者相距 60 公里以上，别导航错。</p>
+  <p>❌ <b>春天以外的季节也要注意柳絮。</b>本地笔记提醒：柳絮多的时候不戴口罩鼻子很难受（10 月问题不大，敏感体质备一个）。</p>
+</div>
+
+<div class="ok">
+  <strong>✅ 杭州这一站的总体判断</strong>
+  <p style="margin:6px 0 0">西湖是四城里唯一「热度碾压、玩法还便宜」的地方：<b>环湖公交船 6–8 元一站、水上巴士 3 元、共享单车到处都是、绝大多数景点免费</b>。<b>真正要花钱的只有雷峰塔 40 元、净慈寺 10 元和游船</b> —— 所以杭州不用省，也不用抢，<b>唯一要抢的是时间</b>。</p>
+</div>
+
+
+<h2>附：关于「小地图」这件事</h2>
+<div class="card">
+  <p><b>你问的连接器：腾讯地图（不是高德/百度）已经接入，但没有「地图图片」能力。</b>它能做的是——地址转经纬度、地点搜索、路线规划（驾车/公交/步行/骑行）、距离与耗时。</p>
+  <p>所以这份攻略里的 4 张地图，是<b>按真实经纬度用等距投影手绘的 SVG 矢量图</b>：</p>
+  <ul>
+    <li>✅ 坐标是真的（每个点都是连接器返回的实际经纬度）、方格是真实公里数、<b>右上角有指北针（上北下南）</b></li>
+    <li>✅ <b>距离白底框放在两个点的连线中间</b>，所以能直接看出「哪到哪」，不是笼统地堆在点下面</li>
+    <li>✅ 零外链、离线能看、放大不糊、能直接打印进 PDF</li>
+    <li>❌ 没有路网底图、没有街道名 —— 它是「关系示意图」，不是导航图</li>
+  </ul>
+  <p><b>如果你想要真地图底图，有两条路：</b></p>
+  <ul>
+    <li><b>路线 A（推荐，能保持离线可用）</b>：拿腾讯地图或高德的静态地图 API Key，我调接口生成带标记和折线的地图图片，转成 base64 内联进 HTML。这样既是真底图，又不断网。需要你提供一个 Key。</li>
+    <li><b>路线 B（最真实，但必须联网）</b>：在 HTML 里嵌腾讯地图 JS API，可以拖动缩放、点开看详情。代价是断网就白屏，且需要 Key。</li>
+  </ul>
+  <p>另外，腾讯地图还有「指南制作」连接器，可以把这份攻略的行程同步成地图 App 里的行程指南 —— 好处是全程能在手机地图里导航，坏处是它导出的是地图 App 内链接，不能内嵌进 HTML。</p>
+</div>
+
+<dialog class="city-dialog" id="city-dialog" aria-labelledby="city-dialog-title">
+  <div class="dialog-shell">
+    <button class="dialog-close" type="button" data-close-dialog aria-label="关闭城市攻略">×</button>
+    <div class="city-no" id="city-dialog-no"></div>
+    <h2 id="city-dialog-title"></h2>
+    <p class="city-date" id="city-dialog-date"></p>
+    <p class="city-brief" id="city-dialog-brief"></p>
+    <div class="city-facts">
+      <div class="city-fact"><span>这站重点</span><b id="city-dialog-focus"></b></div>
+      <div class="city-fact"><span>住宿落点</span><b id="city-dialog-hotel"></b></div>
+    </div>
+    <div class="city-alert" id="city-dialog-alert"></div>
+    <div class="dialog-actions">
+      <button class="dialog-action primary" type="button" data-city-action="map">看这座城的地图</button>
+      <button class="dialog-action" type="button" data-city-action="days">跳到每日动线</button>
+      <button class="dialog-action" type="button" data-city-action="guide">打开深度攻略</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="map-dialog" id="map-dialog" aria-labelledby="map-dialog-title">
+  <div class="dialog-shell">
+    <button class="dialog-close" type="button" data-close-map aria-label="关闭大地图">×</button>
+    <h2 id="map-dialog-title">城市地图</h2>
+    <div class="map-lightbox-canvas" id="map-lightbox-canvas"></div>
+  </div>
+</dialog>
+
+<button class="back-top" type="button" aria-label="返回页面顶部">↑</button>
+
+<footer>
+  内容更新：2026-09-28 · 交互页面：v12.2（城市分层侧栏版）<br>
+  本版规则：<b>凡「要抢预约 / 要候补 / 要电话确认」的项目，一律挂进「🅟 预备项目池」—— 不占时间块，但预约方式与插入位置都写明了</b>（南京博物院 / 中山陵 / 苏博 / 上博 / 灵隐 / 漂流 / 夜游）；「到了门口买票就进」的才排进时间块<br>
+  小红书数据：实抓 <b>1217 篇</b>笔记（南京 171 / 苏州 381 / 上海 329 / 杭州 336），共 50 组关键词，搜索页接口 + DOM 双通道采集；其中 20 篇高赞笔记读了正文<br>
+  上海住宿：<b>富饶智选酒店（南车站路 1 号富南大厦 4 楼）</b>，10/3–10/5 两晚 · 2 间双床，上海段通勤已按该门址重算<br>
+  通勤数据来源：腾讯地图路线规划接口（上海段 2026-09-28 22:30 实测 / 其余 2026-09-26 实测）｜住宿信息：已订订单<br>
+  浏览器 Ctrl+P（Mac: ⌘+P）可打印或存为 PDF
+</footer>
+
+</div>
+<script>
+(() => {
+  const cities = {
+    nanjing: {
+      no: 'CITY 01', name: '南京', date: '9 月 30 日晚—10 月 2 日早',
+      brief: '落地当晚先看夫子庙秦淮河夜景，唯一整天留给钟山、老城和梧桐街区。',
+      focus: '秦淮河夜景、陵园路梧桐大道、明孝陵、老门东',
+      hotel: '古南都逸居酒店（南京新街口地铁站店）',
+      alert: '要预约：中山陵、南京博物院。若预约没抢到，直接按正文里的城墙与老城替代线走。',
+      map: 'map-nanjing', guide: 's10', days: 'day-0930'
+    },
+    suzhou: {
+      no: 'CITY 02', name: '苏州', date: '10 月 2 日—10 月 3 日',
+      brief: '先走城南步行圈和十全街夜景，次日把早场留给园林，再沿平江路收尾后进上海。',
+      focus: '网师园、十全街、拙政园、平江路',
+      hotel: '来住酒店（苏州观前十全街店）',
+      alert: '要预约：拙政园；苏州博物馆若想去也需提前抢。园林国庆早场更舒服。',
+      map: 'map-suzhou', guide: 's11', days: 'day-1002'
+    },
+    shanghai: {
+      no: 'CITY 03', name: '上海', date: '10 月 3 日—10 月 5 日',
+      brief: '豫园夜景开场，完整一天串武康路、陆家嘴、南京路和外滩，夜景是这一站的压轴。',
+      focus: '武康大楼、2 元轮渡、陆家嘴、外滩夜景',
+      hotel: '富饶智选酒店（第九人民医院 · 陆家浜路地铁站店）',
+      alert: '外滩国庆夜间可能交通管制，回程优先走到南京东路站坐地铁；上海博物馆属于可选预约项。',
+      map: 'map-shanghai', guide: 's12', days: 'day-1003'
+    },
+    hangzhou: {
+      no: 'CITY 04', name: '杭州', date: '10 月 5 日—10 月 7 日',
+      brief: '先看西湖与老街，10 月 6 日白天优先漂流；若停漂或公交接不上，切换西湖西线秘境。',
+      focus: '白天漂流、西湖西线、净慈寺机位、河坊街',
+      hotel: '汉庭酒店（杭州文三路地铁站店）',
+      alert: '漂流必须提前电话确认开漂、检票和返程末班；灵隐只作候补预约，不挤占固定时间。',
+      map: 'map-hangzhou', guide: 's13', days: 'day-1005'
+    }
+  };
+
+  const compactMedia = matchMedia('(max-width:700px)');
+  const sectionStates = new Map();
+  const subsectionStates = new Map();
+  const cityDialog = document.querySelector('#city-dialog');
+  const mapDialog = document.querySelector('#map-dialog');
+  let activeCity = 'nanjing';
+  const safeShow = dialog => typeof dialog.showModal === 'function' ? dialog.showModal() : dialog.setAttribute('open', '');
+  const safeClose = dialog => typeof dialog.close === 'function' ? dialog.close() : dialog.removeAttribute('open');
+  const setSectionOpen = (id, open, manual = false) => {
+    const state = sectionStates.get(id);
+    if (!state) return;
+    state.open = open;
+    if (manual) state.manual = true;
+    state.heading.classList.toggle('is-collapsed', !open);
+    state.button.setAttribute('aria-expanded', String(open));
+    state.button.firstChild.textContent = open ? '收起' : '展开';
+    state.elements.forEach(element => {
+      if (!open) {
+        element.hidden = true;
+        return;
+      }
+      if (element.classList.contains('subsection-heading')) {
+        element.hidden = false;
+        return;
+      }
+      const subsection = subsectionStates.get(element.dataset.subsectionOwner);
+      element.hidden = subsection ? !subsection.open : false;
+    });
+  };
+  const revealSectionFor = target => {
+    const id = target.id && sectionStates.has(target.id) ? target.id : target.dataset.sectionOwner;
+    if (id) setSectionOpen(id, true, true);
+    const subsectionId = target.id && subsectionStates.has(target.id) ? target.id : target.dataset.subsectionOwner;
+    if (subsectionId) setSubsectionOpen(subsectionId, true, true);
+  };
+  const jumpTo = (id, sourceLink = null) => {
+    const target = document.getElementById(id);
+    if (!target) return;
+    revealSectionFor(target);
+    if (target.classList.contains('mobile-collapsible') && target.classList.contains('is-folded')) {
+      target.querySelector('.fold-toggle')?.click();
+    }
+    setActiveSideLink(id, sourceLink);
+    target.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'});
+    if (target.classList.contains('map')) {
+      target.classList.remove('map-pulse');
+      void target.offsetWidth;
+      target.classList.add('map-pulse');
+    }
+  };
+
+  function openCity(key) {
+    const city = cities[key];
+    if (!city) return;
+    activeCity = key;
+    document.querySelectorAll('.city-stop').forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.city === key)));
+    document.querySelector('#city-dialog-no').textContent = city.no;
+    document.querySelector('#city-dialog-title').textContent = city.name + '攻略';
+    document.querySelector('#city-dialog-date').textContent = city.date;
+    document.querySelector('#city-dialog-brief').textContent = city.brief;
+    document.querySelector('#city-dialog-focus').textContent = city.focus;
+    document.querySelector('#city-dialog-hotel').textContent = city.hotel;
+    document.querySelector('#city-dialog-alert').textContent = '预约提示｜' + city.alert;
+    safeShow(cityDialog);
+  }
+
+  document.querySelectorAll('.city-stop').forEach(btn => btn.addEventListener('click', () => openCity(btn.dataset.city)));
+  document.querySelector('[data-open-gateway]').addEventListener('click', () => jumpTo('city-gateway'));
+  document.querySelector('[data-close-dialog]').addEventListener('click', () => safeClose(cityDialog));
+  document.querySelector('[data-close-map]').addEventListener('click', () => safeClose(mapDialog));
+  [cityDialog, mapDialog].forEach(dialog => dialog.addEventListener('click', event => {
+    if (event.target === dialog) safeClose(dialog);
+  }));
+  document.querySelectorAll('[data-city-action]').forEach(btn => btn.addEventListener('click', () => {
+    const city = cities[activeCity];
+    const destination = city[btn.dataset.cityAction];
+    safeClose(cityDialog);
+    requestAnimationFrame(() => jumpTo(destination));
+  }));
+
+  const itineraryIds = ['day-0930','day-1001','day-1002','day-1003','day-1004','day-1005','day-1006','day-1007'];
+  document.querySelectorAll('#s3 ~ h3').forEach((heading, index) => {
+    if (itineraryIds[index]) heading.id = itineraryIds[index];
+  });
+
+  [
+    ['s10','nanjing'],['s11','suzhou'],['s12','shanghai'],['s13','hangzhou']
+  ].forEach(([sectionId, cityKey]) => {
+    const section = document.getElementById(sectionId);
+    let cursor = section?.nextElementSibling;
+    while (cursor && cursor.tagName !== 'H2') {
+      if (cursor.tagName === 'H3') {
+        const label = cursor.cloneNode(true);
+        label.querySelectorAll('.cost').forEach(node => node.remove());
+        if (label.textContent.includes('吃什么')) cursor.id = `food-${cityKey}`;
+        if (label.textContent.includes('避坑')) cursor.id = `pitfall-${cityKey}`;
+      }
+      cursor = cursor.nextElementSibling;
+    }
+  });
+
+  const cityKeys = Object.keys(cities);
+  const hotelOrder = ['南京','苏州','上海','杭州'];
+  const hotelCards = [...document.querySelectorAll('.hotel-card')];
+  const mapSection = document.querySelector('#s2');
+  hotelOrder.forEach(cityName => {
+    const card = hotelCards.find(item => item.querySelector('h4')?.textContent.includes(cityName));
+    if (card && mapSection) mapSection.parentNode.insertBefore(card, mapSection);
+  });
+
+  document.querySelectorAll('.wrap > h2[id^="s"]').forEach(heading => {
+    const elements = [];
+    let cursor = heading.nextElementSibling;
+    while (cursor && cursor.tagName !== 'H2') {
+      elements.push(cursor);
+      cursor.dataset.sectionOwner = heading.id;
+      cursor = cursor.nextElementSibling;
+    }
+    heading.classList.add('section-heading');
+    heading.dataset.sectionOwner = heading.id;
+    const button = document.createElement('button');
+    button.className = 'section-toggle';
+    button.type = 'button';
+    button.innerHTML = '<span>展开</span>';
+    heading.append(button);
+    const defaultMobileOpen = new Set(['s0','s1','s2','s3','s4','s5']).has(heading.id);
+    sectionStates.set(heading.id, {heading, button, elements, open:true, manual:false, defaultMobileOpen});
+    button.addEventListener('click', () => setSectionOpen(heading.id, !sectionStates.get(heading.id).open, true));
+  });
+
+  const applySectionMode = () => {
+    sectionStates.forEach((state, id) => {
+      if (!compactMedia.matches) setSectionOpen(id, true);
+      else if (!state.manual) setSectionOpen(id, state.defaultMobileOpen);
+    });
+  };
+  applySectionMode();
+  compactMedia.addEventListener?.('change', applySectionMode);
+
+  const setSubsectionOpen = (id, open, manual = false) => {
+    const state = subsectionStates.get(id);
+    if (!state) return;
+    state.open = open;
+    if (manual) state.manual = true;
+    state.heading.classList.toggle('is-collapsed', !open);
+    state.button.setAttribute('aria-expanded', String(open));
+    state.button.firstChild.textContent = open ? '收起' : '展开';
+    state.elements.forEach(element => element.hidden = !open);
+  };
+
+  const subsectionOwners = new Set(['s2','s3','s10','s11','s12','s13']);
+  document.querySelectorAll('.wrap > h3[data-section-owner]').forEach((heading, index) => {
+    const owner = heading.dataset.sectionOwner;
+    if (!subsectionOwners.has(owner)) return;
+    if (!heading.id) heading.id = `sub-${owner}-${index + 1}`;
+    const elements = [];
+    let cursor = heading.nextElementSibling;
+    while (cursor && cursor.dataset.sectionOwner === owner && cursor.tagName !== 'H3') {
+      elements.push(cursor);
+      cursor.dataset.subsectionOwner = heading.id;
+      cursor = cursor.nextElementSibling;
+    }
+    heading.classList.add('subsection-heading');
+    heading.dataset.subsectionOwner = heading.id;
+    const button = document.createElement('button');
+    button.className = 'subsection-toggle';
+    button.type = 'button';
+    button.innerHTML = '<span>展开</span>';
+    heading.append(button);
+    const headingLabel = heading.cloneNode(true);
+    headingLabel.querySelectorAll('.cost,.subsection-toggle').forEach(node => node.remove());
+    const evidenceSection = /热度榜|锐评榜|避坑|规则怪谈|劝退/.test(headingLabel.textContent);
+    const defaultMobileOpen = owner === 's2' || owner === 's3' || !evidenceSection;
+    subsectionStates.set(heading.id, {heading, button, elements, open:true, manual:false, defaultMobileOpen});
+    button.addEventListener('click', () => setSubsectionOpen(heading.id, !subsectionStates.get(heading.id).open, true));
+  });
+
+  const applySubsectionMode = () => {
+    subsectionStates.forEach((state, id) => {
+      if (!compactMedia.matches) setSubsectionOpen(id, true);
+      else if (!state.manual) setSubsectionOpen(id, state.defaultMobileOpen);
+    });
+  };
+  applySubsectionMode();
+  compactMedia.addEventListener?.('change', applySubsectionMode);
+
+  document.querySelectorAll('.toc a[href^="#s"]').forEach(link => link.addEventListener('click', event => {
+    const id = link.getAttribute('href').slice(1);
+    if (!sectionStates.has(id)) return;
+    event.preventDefault();
+    setSectionOpen(id, true, true);
+    jumpTo(id);
+  }));
+
+  const foldTypes = [
+    ['danger','避坑提醒'], ['warn','注意事项'], ['src-note','调研依据'], ['note','补充说明']
+  ];
+  document.querySelectorAll('.note,.warn,.danger,.src-note,#pool').forEach(box => {
+    if (box.closest('dialog') || box.textContent.trim().length < 90) return;
+    const type = foldTypes.find(([className]) => box.classList.contains(className));
+    const body = document.createElement('div');
+    body.className = 'fold-body';
+    while (box.firstChild) body.append(box.firstChild);
+    const toggle = document.createElement('button');
+    toggle.className = 'fold-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-expanded', 'false');
+    const label = box.id === 'pool' ? '预约项目池' : (type ? type[1] : '展开说明');
+    toggle.innerHTML = `<span class="fold-label">${label}</span><span class="fold-state">展开</span>`;
+    box.classList.add('mobile-collapsible','is-folded');
+    box.append(toggle, body);
+    toggle.addEventListener('click', () => {
+      const folded = box.classList.toggle('is-folded');
+      toggle.setAttribute('aria-expanded', String(!folded));
+      toggle.querySelector('.fold-state').textContent = folded ? '展开' : '收起';
+    });
+  });
+
+  const sidebar = document.querySelector('#city-sidebar');
+  const sidebarToggle = document.querySelector('.side-menu-toggle');
+  const sidebarBackdrop = document.querySelector('.sidebar-backdrop');
+  const sidebarClose = document.querySelector('.sidebar-close');
+  const sideCities = [...document.querySelectorAll('.side-city')];
+  const applySidebarMode = () => {
+    if (!compactMedia.matches) {
+      sideCities.forEach(city => city.open = true);
+      return;
+    }
+    const activeCity = document.querySelector('[data-side-jump].is-active')?.closest('.side-city');
+    sideCities.forEach((city, index) => city.open = activeCity ? city === activeCity : index === 0);
+  };
+  function setSidebar(open) {
+    document.body.classList.toggle('sidebar-open', open);
+    sidebarToggle.setAttribute('aria-expanded', String(open));
+    if (open) sidebar.querySelector('.sidebar-home')?.focus({preventScroll:true});
+    else sidebarToggle.focus({preventScroll:true});
+  }
+  function setActiveSideLink(id, sourceLink = null) {
+    document.querySelectorAll('[data-side-jump]').forEach(link => {
+      const active = sourceLink ? link === sourceLink : link.dataset.sideJump === id;
+      link.classList.toggle('is-active', active);
+      if (active) link.closest('details')?.setAttribute('open','');
+    });
+  }
+  sideCities.forEach(city => city.addEventListener('toggle', () => {
+    if (compactMedia.matches && city.open) sideCities.forEach(other => {
+      if (other !== city) other.open = false;
+    });
+  }));
+  applySidebarMode();
+  compactMedia.addEventListener?.('change', applySidebarMode);
+  sidebarToggle.addEventListener('click', () => setSidebar(true));
+  sidebarBackdrop.addEventListener('click', () => setSidebar(false));
+  sidebarClose.addEventListener('click', () => setSidebar(false));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && document.body.classList.contains('sidebar-open')) setSidebar(false);
+  });
+  document.querySelectorAll('[data-side-jump]').forEach(link => link.addEventListener('click', event => {
+    event.preventDefault();
+    if (innerWidth < 1240) setSidebar(false);
+    jumpTo(link.dataset.sideJump, link);
+  }));
+
+  document.querySelectorAll('.map').forEach((map, index) => {
+    const key = cityKeys[index];
+    if (!key) return;
+    map.id = cities[key].map;
+    map.dataset.city = key;
+    const toolbar = document.createElement('div');
+    toolbar.className = 'map-toolbar';
+    toolbar.innerHTML = `<div class="map-toolbar-label">${cities[key].name}关系地图</div><div class="map-toolbar-actions"><button class="map-tool" type="button" data-enlarge-map>放大地图</button><button class="map-tool" type="button" data-map-guide>详细攻略</button></div>`;
+    map.prepend(toolbar);
+    toolbar.querySelector('[data-enlarge-map]').addEventListener('click', () => {
+      const svg = map.querySelector('svg');
+      document.querySelector('#map-dialog-title').textContent = cities[key].name + ' · 路线与距离地图';
+      document.querySelector('#map-lightbox-canvas').replaceChildren(svg.cloneNode(true));
+      safeShow(mapDialog);
+    });
+    toolbar.querySelector('[data-map-guide]').addEventListener('click', () => jumpTo(cities[key].guide));
+  });
+
+  const progress = document.querySelector('.scroll-progress');
+  const backTop = document.querySelector('.back-top');
+  function updateScrollUI() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    progress.style.width = (max > 0 ? scrollY / max * 100 : 0) + '%';
+    backTop.classList.toggle('show', scrollY > 700);
+  }
+  addEventListener('scroll', updateScrollUI, {passive:true});
+  updateScrollUI();
+  backTop.addEventListener('click', () => scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
+})();
+</script>
+</body>
+</html>
